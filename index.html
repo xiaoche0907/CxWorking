@@ -530,6 +530,16 @@
                                                     <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1">无密码</span>
                                                 </div>
 
+                                                <!-- Attachments List (Kanban Card) -->
+                                                <div v-if="project.attachments && project.attachments.length > 0" class="flex flex-wrap gap-1 mb-3 ml-1.5 pt-2.5 border-t border-slate-200 dark:border-slate-850/80">
+                                                    <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" download class="inline-flex items-center gap-1 py-1 px-2 bg-violet-50/50 dark:bg-violet-955/40 hover:bg-violet-100 dark:hover:bg-violet-900/50 border border-violet-200/50 dark:border-violet-800/30 text-[10px] text-violet-650 dark:text-violet-400 font-semibold rounded-lg transition-colors max-w-full" :title="file.name">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                        </svg>
+                                                        <span class="truncate max-w-[80px]">{{ file.name }}</span>
+                                                    </a>
+                                                </div>
+
                                                 <!-- Card Footer: Last updated tracking -->
                                                 <div class="flex items-center justify-between text-[9px] text-slate-400 dark:text-slate-550 pt-2 border-t border-slate-150 dark:border-slate-850/80 ml-1.5">
                                                     <span>跟进: {{ getRelativeTimeText(project.lastUpdatedAt) }}</span>
@@ -626,8 +636,8 @@
                                                     </div>
                                                 </td>
                                                 <td class="py-4 px-6 whitespace-nowrap">
-                                                    <div class="flex items-center gap-2">
-                                                        <button v-if="project.link" @click="copyText(project.link, '链接')" class="cursor-pointer p-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-violet-650 dark:hover:text-violet-400 rounded-lg hover:border-violet-500/30 transition-all duration-200" title="复制文档链接">
+                                                    <div class="flex items-center gap-2 flex-wrap max-w-[220px]">
+                                                        <button v-if="project.link" @click="copyText(project.link, '链接')" class="cursor-pointer p-1.5 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-violet-650 dark:hover:text-violet-400 rounded-lg hover:border-violet-500/30 transition-all duration-200" title="复制文档链接">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                                             </svg>
@@ -637,7 +647,18 @@
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m9-3h-3m3 3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                             </svg>
                                                         </button>
-                                                        <span v-if="!project.link && !project.password" class="text-xs text-slate-400 dark:text-slate-600">-</span>
+
+                                                        <!-- Attachments in List View -->
+                                                        <div v-if="project.attachments && project.attachments.length > 0" class="flex flex-wrap gap-1 items-center">
+                                                            <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" download class="inline-flex items-center gap-0.5 py-1 px-1.5 bg-violet-50 dark:bg-violet-955/40 hover:bg-violet-100 dark:hover:bg-violet-900/60 border border-violet-200/50 dark:border-violet-800/30 text-[10px] text-violet-650 dark:text-violet-400 font-semibold rounded-lg transition-colors max-w-full" :title="file.name">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                                </svg>
+                                                                <span class="truncate max-w-[60px]">{{ file.name }}</span>
+                                                            </a>
+                                                        </div>
+
+                                                        <span v-if="!project.link && !project.password && (!project.attachments || project.attachments.length === 0)" class="text-xs text-slate-400 dark:text-slate-650">-</span>
                                                     </div>
                                                 </td>
                                                 <td class="py-4 px-6 text-right text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
@@ -808,6 +829,44 @@
                                         <input type="text" v-model="formProject.password" placeholder="如 4位提取码" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                     </div>
                                 </div>
+                                <!-- Attachments Upload Section -->
+                                <div class="p-4 bg-slate-50 dark:bg-slate-955/65 border border-slate-150 dark:border-slate-850 rounded-2xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-xs font-bold text-violet-650 dark:text-violet-400 uppercase">📁 项目附件 (支持 Word, PDF, Excel, PPT, text 等)</label>
+                                        <label class="cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg shadow-sm transition-all">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                            </svg>
+                                            <span>添加文件</span>
+                                            <input type="file" @change="uploadAttachment" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg">
+                                        </label>
+                                    </div>
+                                    <div v-if="isUploading" class="text-xs text-slate-500 dark:text-slate-400 animate-pulse py-2 flex items-center gap-1.5 justify-center">
+                                        <svg class="animate-spin h-3.5 w-3.5 text-violet-600 dark:text-violet-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        文件上传中，请稍候...
+                                    </div>
+                                    <div v-if="formProject.attachments && formProject.attachments.length > 0" class="space-y-1.5 mt-2">
+                                        <div v-for="(file, idx) in formProject.attachments" :key="idx" class="flex items-center justify-between p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-805 rounded-xl text-xs gap-2">
+                                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span class="font-semibold text-slate-700 dark:text-slate-350 truncate" :title="file.name">{{ file.name }}</span>
+                                                <span class="text-[10px] text-slate-455 dark:text-slate-500 shrink-0">({{ file.size || '未知' }})</span>
+                                            </div>
+                                            <div class="flex items-center gap-1.5 shrink-0">
+                                                <a :href="file.url" target="_blank" download class="text-violet-650 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">查看</a>
+                                                <button type="button" @click="removeAttachment(idx)" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">删除</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else class="text-[11px] text-center text-slate-400 dark:text-slate-600 py-3 bg-white/40 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 mt-2">
+                                        暂无附件，点击右上角 “添加文件” 开始上传
+                                    </div>
+                                </div>
                                 <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-955/40 -mx-6 -mb-6 px-6 py-4">
                                     <button type="button" @click="showAddModal = false" class="cursor-pointer px-5 py-2 bg-slate-100 dark:bg-slate-850 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-650 dark:text-slate-300 text-sm font-semibold rounded-xl border border-slate-250 dark:border-slate-750 transition-colors">
                                         取消
@@ -905,6 +964,44 @@
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">提取密码 (可选)</label>
                                         <input type="text" v-model="formProject.password" placeholder="如 4位密码" class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                    </div>
+                                </div>
+                                <!-- Attachments Upload Section -->
+                                <div class="p-4 bg-slate-50 dark:bg-slate-955/65 border border-slate-150 dark:border-slate-850 rounded-2xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <label class="block text-xs font-bold text-violet-650 dark:text-violet-400 uppercase">📁 项目附件 (支持 Word, PDF, Excel, PPT, text 等)</label>
+                                        <label class="cursor-pointer inline-flex items-center gap-1 px-2.5 py-1 bg-violet-600 hover:bg-violet-500 text-white text-xs font-semibold rounded-lg shadow-sm transition-all">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                            </svg>
+                                            <span>添加文件</span>
+                                            <input type="file" @change="uploadAttachment" class="hidden" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.png,.jpg,.jpeg">
+                                        </label>
+                                    </div>
+                                    <div v-if="isUploading" class="text-xs text-slate-500 dark:text-slate-400 animate-pulse py-2 flex items-center gap-1.5 justify-center">
+                                        <svg class="animate-spin h-3.5 w-3.5 text-violet-600 dark:text-violet-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                        </svg>
+                                        文件上传中，请稍候...
+                                    </div>
+                                    <div v-if="formProject.attachments && formProject.attachments.length > 0" class="space-y-1.5 mt-2">
+                                        <div v-for="(file, idx) in formProject.attachments" :key="idx" class="flex items-center justify-between p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-805 rounded-xl text-xs gap-2">
+                                            <div class="flex items-center gap-2 min-w-0 flex-1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                </svg>
+                                                <span class="font-semibold text-slate-700 dark:text-slate-350 truncate" :title="file.name">{{ file.name }}</span>
+                                                <span class="text-[10px] text-slate-455 dark:text-slate-500 shrink-0">({{ file.size || '未知' }})</span>
+                                            </div>
+                                            <div class="flex items-center gap-1.5 shrink-0">
+                                                <a :href="file.url" target="_blank" download class="text-violet-650 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">查看</a>
+                                                <button type="button" @click="removeAttachment(idx)" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">删除</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-else class="text-[11px] text-center text-slate-400 dark:text-slate-600 py-3 bg-white/40 dark:bg-slate-900/30 rounded-xl border border-dashed border-slate-200 dark:border-slate-800 mt-2">
+                                        暂无附件，点击右上角 “添加文件” 开始上传
                                     </div>
                                 </div>
                                 <div class="p-4 bg-slate-50 dark:bg-slate-955 border border-slate-150 dark:border-slate-850 rounded-2xl">
@@ -1038,6 +1135,7 @@
                         ddl: "2026-06-25",
                         assignee: "俊宇",
                         coWorkers: [],
+                        attachments: [],
                         link: "https://pan.baidu.com/s/1xyzExampleLink",
                         password: "abcd",
                         lastUpdatedBy: "俊宇",
@@ -1053,6 +1151,7 @@
                         ddl: "2026-06-23", 
                         assignee: "小彻",
                         coWorkers: [],
+                        attachments: [],
                         link: "https://pan.baidu.com/s/2uvwExampleLink",
                         password: "efgh",
                         lastUpdatedBy: "小彻",
@@ -1068,6 +1167,7 @@
                         ddl: "2026-06-30",
                         assignee: "陆叶",
                         coWorkers: [],
+                        attachments: [],
                         link: "https://pan.baidu.com/s/3rstExampleLink",
                         password: "ijkl",
                         lastUpdatedBy: "陆叶",
@@ -1083,6 +1183,7 @@
                         ddl: "2026-07-15",
                         assignee: "阿旺",
                         coWorkers: [],
+                        attachments: [],
                         link: "",
                         password: "",
                         lastUpdatedBy: "系统",
@@ -1098,6 +1199,7 @@
                         ddl: "2026-06-24",
                         assignee: "俊宇",
                         coWorkers: [],
+                        attachments: [],
                         link: "https://pan.baidu.com/s/5qweExampleLink",
                         password: "qwer",
                         lastUpdatedBy: "俊宇",
@@ -1170,6 +1272,7 @@ CREATE TABLE cx_projects (
     ddl DATE,
     assignee TEXT,
     co_workers TEXT, -- 配合的成员 (逗号分隔的用户名)
+    attachments TEXT, -- 项目附件 (JSON 字符串)
     link TEXT,
     password TEXT,
     last_updated_by TEXT,
@@ -1178,6 +1281,7 @@ CREATE TABLE cx_projects (
 
 -- 如果表已存在，执行以下语句以升级表：
 -- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS co_workers TEXT;
+-- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS attachments TEXT;
 
 CREATE TABLE cx_logs (
     id BIGINT PRIMARY KEY,
@@ -1221,6 +1325,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 const supabaseClient = ref(null);
                 const tempCloudUrl = ref("");
                 const tempCloudKey = ref("");
+                const isUploading = ref(false);
 
                 // Dashboard States
                 const projects = ref([]);
@@ -1354,6 +1459,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 ddl: p.ddl,
                                 assignee: p.assignee,
                                 coWorkers: p.co_workers ? p.co_workers.split(',') : [],
+                                attachments: p.attachments ? JSON.parse(p.attachments) : [],
                                 link: p.link,
                                 password: p.password,
                                 lastUpdatedBy: p.last_updated_by,
@@ -1857,6 +1963,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                         ddl: new Date().toISOString().substr(0, 10),
                         assignee: loggedUser.value || "阿旺",
                         coWorkers: [],
+                        attachments: [],
                         link: "",
                         password: ""
                     };
@@ -1900,6 +2007,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                     ddl: finalDdl || null,
                                     assignee: newProj.assignee,
                                     co_workers: (newProj.coWorkers && newProj.coWorkers.length > 0) ? newProj.coWorkers.join(',') : null,
+                                    attachments: (newProj.attachments && newProj.attachments.length > 0) ? JSON.stringify(newProj.attachments) : null,
                                     link: newProj.link,
                                     password: newProj.password,
                                     last_updated_by: newProj.lastUpdatedBy,
@@ -1919,7 +2027,8 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 const openEditModal = (project) => {
                     formProject.value = {
                         ...project,
-                        coWorkers: project.coWorkers || []
+                        coWorkers: project.coWorkers || [],
+                        attachments: project.attachments || []
                     };
                     ddlPending.value = !project.ddl || project.ddl === '待定';
                     followUpNote.value = "";
@@ -1959,6 +2068,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                         ddl: finalDdl || null,
                                         assignee: newProj.assignee,
                                         co_workers: (newProj.coWorkers && newProj.coWorkers.length > 0) ? newProj.coWorkers.join(',') : null,
+                                        attachments: (newProj.attachments && newProj.attachments.length > 0) ? JSON.stringify(newProj.attachments) : null,
                                         link: newProj.link,
                                         password: newProj.password,
                                         last_updated_by: newProj.lastUpdatedBy,
@@ -2037,6 +2147,116 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                         pushLog(project.id, project.name, "delete", `项目已被删除`);
                         showEditModal.value = false;
                         showToast("项目已成功删除", "success");
+                    }
+                };
+
+                const uploadAttachment = async (event) => {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    if (!formProject.value.attachments) {
+                        formProject.value.attachments = [];
+                    }
+
+                    const isCloud = isCloudMode.value && supabaseClient.value;
+                    const maxSize = isCloud ? 10 * 1024 * 1024 : 500 * 1024; // 10MB or 500KB
+                    
+                    if (file.size > maxSize) {
+                        if (isCloud) {
+                            showToast("文件大小超出限制，云端模式最大支持 10MB！", "error");
+                        } else {
+                            showToast("文件大小超出限制，本地模式最大支持 500KB！请切换至云同步模式以支持大文件。", "error");
+                        }
+                        event.target.value = '';
+                        return;
+                    }
+
+                    showToast("正在上传附件...", "info");
+                    isUploading.value = true;
+
+                    try {
+                        if (isCloud) {
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 5)}.${fileExt}`;
+                            const filePath = `${formProject.value.id}/${fileName}`;
+                            
+                            const { data, error } = await supabaseClient.value.storage
+                                .from('cx-attachments')
+                                .upload(filePath, file, {
+                                    cacheControl: '3600',
+                                    upsert: false
+                                });
+
+                            if (error) {
+                                if (error.message && (error.message.includes("bucket") || error.message.includes("does not exist") || error.error === "bucket_not_found")) {
+                                    showToast("上传失败：未找到存储桶 cx-attachments。请在 Supabase 后台 Storage 中新建一个公有且名称为 cx-attachments 的存储桶！", "error");
+                                } else {
+                                    showToast(`云端上传失败: ${error.message || error}`, "error");
+                                }
+                                throw error;
+                            }
+
+                            const { data: urlData } = supabaseClient.value.storage
+                                .from('cx-attachments')
+                                .getPublicUrl(filePath);
+
+                            if (!urlData || !urlData.publicUrl) {
+                                throw new Error("获取公有链接失败");
+                            }
+
+                            formProject.value.attachments.push({
+                                name: file.name,
+                                url: urlData.publicUrl,
+                                path: filePath,
+                                size: (file.size / 1024).toFixed(1) + " KB",
+                                uploadedAt: new Date().toISOString()
+                            });
+                            showToast("附件上传云端成功！", "success");
+                        } else {
+                            const reader = new FileReader();
+                            reader.onload = (e) => {
+                                const base64Data = e.target.result;
+                                formProject.value.attachments.push({
+                                    name: file.name,
+                                    url: base64Data,
+                                    size: (file.size / 1024).toFixed(1) + " KB",
+                                    uploadedAt: new Date().toISOString()
+                                });
+                                showToast("附件导入本地成功！", "success");
+                            };
+                            reader.onerror = () => {
+                                showToast("读取文件失败", "error");
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    } catch (err) {
+                        console.error("Upload error:", err);
+                    } finally {
+                        isUploading.value = false;
+                        event.target.value = '';
+                    }
+                };
+
+                const removeAttachment = async (index) => {
+                    const att = formProject.value.attachments[index];
+                    if (!att) return;
+                    
+                    if (confirm(`确定要删除附件 [${att.name}] 吗？`)) {
+                        const isCloud = isCloudMode.value && supabaseClient.value;
+                        if (isCloud && att.path) {
+                            try {
+                                const { error } = await supabaseClient.value.storage
+                                    .from('cx-attachments')
+                                    .remove([att.path]);
+                                if (error) {
+                                    console.warn("Storage deletion warning:", error);
+                                }
+                            } catch (e) {
+                                console.error("Failed to delete attachment from Cloud storage:", e);
+                            }
+                        }
+                        formProject.value.attachments.splice(index, 1);
+                        showToast(`已移除附件 [${att.name}]`, "success");
                     }
                 };
 
@@ -2151,6 +2371,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 ddl: (p.ddl && p.ddl !== '待定') ? p.ddl : null,
                                 assignee: p.assignee,
                                 co_workers: (p.coWorkers && p.coWorkers.length > 0) ? p.coWorkers.join(',') : null,
+                                attachments: (p.attachments && p.attachments.length > 0) ? JSON.stringify(p.attachments) : null,
                                 link: p.link,
                                 password: p.password,
                                 last_updated_by: p.lastUpdatedBy,
@@ -2339,6 +2560,9 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     clearLogs,
                     updateProjectProgressDirectly,
                     ddlPending,
+                    isUploading,
+                    uploadAttachment,
+                    removeAttachment,
                     // Cloud settings
                     showCloudModal,
                     isCloudMode,
