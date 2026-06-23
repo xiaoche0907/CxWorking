@@ -418,7 +418,7 @@
                         <div class="lg:col-span-4 min-w-0">
                             <!-- Kanban View -->
                             <div v-if="viewMode === 'kanban'" class="overflow-x-auto pb-4">
-                                <div class="flex gap-4 min-w-[1250px]">
+                                <div class="flex gap-4 min-w-max lg:min-w-[1720px]">
                                     <!-- Kanban Columns -->
                                     <div v-for="col in kanbanColumns" :key="col.status" 
                                          @dragover.prevent 
@@ -483,15 +483,24 @@
                                                     <div class="flex items-center justify-between text-[11px] font-medium">
                                                         <span class="text-slate-400 dark:text-slate-500">截止日期 (DDL):</span>
                                                         <span :class="['font-semibold font-outfit px-1.5 py-0.5 rounded', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20' : 'text-slate-500 dark:text-slate-400']">
-                                                            {{ project.ddl }}
+                                                            {{ project.ddl || '待定' }}
                                                         </span>
                                                     </div>
                                                 </div>
 
                                                 <!-- Progress Adjuster -->
                                                 <div class="bg-slate-50 dark:bg-slate-955/60 rounded-xl p-2.5 border border-slate-150 dark:border-slate-900 mb-4 ml-1.5 shadow-sm">
-                                                    <div class="flex items-center justify-between text-xs mb-1">
-                                                        <span class="text-slate-505 dark:text-slate-400 font-medium">进度: {{ project.completedCount }}/{{ project.totalCount }} 款</span>
+                                                    <div class="flex items-center justify-between text-xs mb-1.5">
+                                                        <div class="flex items-center gap-1 font-semibold text-slate-550 dark:text-slate-400">
+                                                            <span>进度:</span>
+                                                            <input type="number" 
+                                                                   v-model.number="project.completedCount" 
+                                                                   @change="updateProjectProgressDirectly(project)"
+                                                                   min="0" 
+                                                                   :max="project.totalCount" 
+                                                                   class="w-12 px-1 py-0.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-center text-xs text-slate-850 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-bold">
+                                                            <span>/ {{ project.totalCount }} 款</span>
+                                                        </div>
                                                         <span class="text-blue-600 dark:text-cyan-400 font-bold font-outfit">{{ getProgressPercentage(project) }}%</span>
                                                     </div>
                                                     <div class="w-full bg-slate-200 dark:bg-slate-900/80 rounded-full h-3 overflow-hidden mb-2.5 p-0.5 border border-slate-150 dark:border-slate-800">
@@ -583,19 +592,27 @@
                                                         {{ statusMap[project.status] }}
                                                     </span>
                                                 </td>
-                                                <td class="py-4 px-6 min-w-[150px]">
-                                                    <div class="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
-                                                        <span>{{ project.completedCount }}/{{ project.totalCount }} 套</span>
-                                                        <span class="font-bold text-fuchsia-600 dark:text-cyan-400 font-outfit">{{ getProgressPercentage(project) }}%</span>
+                                                <td class="py-4 px-6 min-w-[180px]">
+                                                    <div class="flex items-center justify-between text-xs text-slate-505 dark:text-slate-400 mb-1.5">
+                                                        <div class="flex items-center gap-1 font-semibold">
+                                                            <input type="number" 
+                                                                   v-model.number="project.completedCount" 
+                                                                   @change="updateProjectProgressDirectly(project)"
+                                                                   min="0" 
+                                                                   :max="project.totalCount" 
+                                                                   class="w-14 px-1.5 py-0.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-md text-center text-xs text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-bold">
+                                                            <span>/ {{ project.totalCount }} 套</span>
+                                                        </div>
+                                                        <span class="font-extrabold text-blue-600 dark:text-cyan-400 font-outfit">{{ getProgressPercentage(project) }}%</span>
                                                     </div>
-                                                    <div class="w-full bg-slate-200 dark:bg-slate-955 rounded-full h-1.5 overflow-hidden">
-                                                        <div class="bg-gradient-to-r from-violet-655 to-fuchsia-500 dark:from-violet-500 dark:to-cyan-400 h-full rounded-full transition-all duration-300" :style="{ width: getProgressPercentage(project) + '%' }"></div>
+                                                    <div class="w-full bg-slate-250 dark:bg-slate-955 rounded-full h-3 overflow-hidden p-0.5 border border-slate-150 dark:border-slate-800">
+                                                        <div class="bg-gradient-to-r from-blue-600 to-cyan-400 dark:from-blue-500 dark:to-cyan-400 h-2 rounded-full transition-all duration-300 shadow-sm" :style="{ width: getProgressPercentage(project) + '%' }"></div>
                                                     </div>
                                                 </td>
                                                 <td class="py-4 px-6 font-outfit text-slate-700 dark:text-slate-300 font-semibold">{{ project.bannerCount }}</td>
                                                 <td class="py-4 px-6">
                                                     <span :class="['font-outfit text-xs px-2 py-0.5 rounded border font-semibold', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20' : 'bg-slate-100 dark:bg-slate-955 text-slate-555 dark:text-slate-400 border-slate-250 dark:border-slate-800']">
-                                                        {{ project.ddl }}
+                                                        {{ project.ddl || '待定' }}
                                                     </span>
                                                 </td>
                                                 <td class="py-4 px-6">
@@ -757,8 +774,14 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">截止时间 (DDL)</label>
-                                        <input type="date" v-model="formProject.ddl" required class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">截止时间 (DDL)</label>
+                                            <label class="inline-flex items-center gap-1.5 text-xs text-violet-650 dark:text-violet-400 font-semibold cursor-pointer">
+                                                <input type="checkbox" v-model="ddlPending" class="rounded border-slate-300 text-violet-650 focus:ring-violet-500">
+                                                <span>待定</span>
+                                            </label>
+                                        </div>
+                                        <input type="date" v-model="formProject.ddl" :disabled="ddlPending" :required="!ddlPending" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all disabled:opacity-50">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
@@ -840,8 +863,14 @@
                                         </select>
                                     </div>
                                     <div>
-                                        <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">截止时间 (DDL)</label>
-                                        <input type="date" v-model="formProject.ddl" required class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                        <div class="flex items-center justify-between mb-1.5">
+                                            <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">截止时间 (DDL)</label>
+                                            <label class="inline-flex items-center gap-1.5 text-xs text-violet-650 dark:text-violet-400 font-semibold cursor-pointer">
+                                                <input type="checkbox" v-model="ddlPending" class="rounded border-slate-300 text-violet-650 focus:ring-violet-500">
+                                                <span>待定</span>
+                                            </label>
+                                        </div>
+                                        <input type="date" v-model="formProject.ddl" :disabled="ddlPending" :required="!ddlPending" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all disabled:opacity-50">
                                     </div>
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
@@ -1151,6 +1180,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 const users = ref([...defaultUsers]);
                 const loginForm = ref({ username: "", password: "" });
                 const registerForm = ref({ username: "", password: "", confirmPassword: "" });
+                const ddlPending = ref(false);
 
                 // Cloud Sync database configurations
                 const showCloudModal = ref(false);
@@ -1545,16 +1575,24 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     const today = new Date('2026-06-22');
                     return projects.value.filter(p => {
                         if (p.status === 'completed' || p.status === 'shelved') return false;
+                        if (!p.ddl || p.ddl === '待定') return false;
                         const ddlDate = new Date(p.ddl);
+                        if (isNaN(ddlDate)) return false;
                         const diffTime = ddlDate - today;
                         const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                         return diffDays >= 0 && diffDays <= 3;
-                    }).sort((a, b) => new Date(a.ddl) - new Date(b.ddl));
+                    }).sort((a, b) => {
+                        const dateA = new Date(a.ddl);
+                        const dateB = new Date(b.ddl);
+                        return dateA - dateB;
+                    });
                 });
 
                 const getDaysRemainingText = (ddl) => {
+                    if (!ddl || ddl === '待定') return '暂未设定';
                     const today = new Date('2026-06-22');
                     const ddlDate = new Date(ddl);
+                    if (isNaN(ddlDate)) return '暂未设定';
                     const diffTime = ddlDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     if (diffDays === 0) return '今天截止';
@@ -1563,8 +1601,10 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 };
 
                 const isUrgent = (ddl) => {
+                    if (!ddl || ddl === '待定') return false;
                     const today = new Date('2026-06-22');
                     const ddlDate = new Date(ddl);
+                    if (isNaN(ddlDate)) return false;
                     const diffTime = ddlDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     return diffDays >= 0 && diffDays <= 3;
@@ -1720,6 +1760,40 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     }
                 };
 
+                const updateProjectProgressDirectly = async (project) => {
+                    let newVal = parseInt(project.completedCount);
+                    if (isNaN(newVal) || newVal < 0) {
+                        newVal = 0;
+                    }
+                    if (newVal > project.totalCount) {
+                        newVal = project.totalCount;
+                    }
+                    project.completedCount = newVal;
+                    
+                    project.lastUpdatedAt = new Date().toISOString();
+                    project.lastUpdatedBy = loggedUser.value;
+                    saveProjectsToLocal();
+
+                    // Cloud push
+                    if (isCloudMode.value && supabaseClient.value) {
+                        try {
+                            await supabaseClient.value
+                                .from('cx_projects')
+                                .update({ 
+                                    completed_count: newVal,
+                                    last_updated_by: loggedUser.value,
+                                    last_updated_at: project.lastUpdatedAt
+                                })
+                                .eq('id', project.id);
+                        } catch (err) {
+                            console.error("Cloud progress update error:", err);
+                        }
+                    }
+
+                    pushLog(project.id, project.name, "progress", `直接修改完成套数为 ${newVal}`);
+                    showToast(`项目 #${project.id} 完成度已更新至 ${newVal}/${project.totalCount}`);
+                };
+
                 const copyText = (text, label) => {
                     if (!text) return;
                     navigator.clipboard.writeText(text).then(() => {
@@ -1729,7 +1803,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     });
                 };
 
-                // Add/Edit Modals Setup
+                 // Add/Edit Modals Setup
                 const openAddModal = () => {
                     formProject.value = {
                         id: `E${(projects.value.length + 101).toString()}`,
@@ -1743,9 +1817,10 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                         link: "",
                         password: ""
                     };
+                    ddlPending.value = false;
                     showAddModal.value = true;
                 };
-
+ 
                 const submitAddProject = async () => {
                     if (projects.value.some(p => p.id === formProject.value.id)) {
                         showToast(`项目编号 ${formProject.value.id} 已存在，请重新指定。`, "error");
@@ -1755,15 +1830,18 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                         formProject.value.completedCount = formProject.value.totalCount;
                     }
                     
+                    const finalDdl = ddlPending.value ? "" : formProject.value.ddl;
+                    
                     const newProj = {
                         ...formProject.value,
+                        ddl: finalDdl,
                         lastUpdatedBy: loggedUser.value,
                         lastUpdatedAt: new Date().toISOString()
                     };
-
+ 
                     projects.value.push(newProj);
                     saveProjectsToLocal();
-
+ 
                     // Cloud push
                     if (isCloudMode.value && supabaseClient.value) {
                         try {
@@ -1776,7 +1854,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                     total_count: newProj.totalCount,
                                     completed_count: newProj.completedCount,
                                     banner_count: newProj.bannerCount,
-                                    ddl: newProj.ddl,
+                                    ddl: finalDdl || null,
                                     assignee: newProj.assignee,
                                     link: newProj.link,
                                     password: newProj.password,
@@ -1788,35 +1866,38 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                             showToast("新建项目上传云数据库失败！", "error");
                         }
                     }
-
+ 
                     pushLog(newProj.id, newProj.name, "create", `新项目创建，负责人为 [${newProj.assignee}]`);
                     showAddModal.value = false;
                     showToast("新项目添加成功！", "success");
                 };
-
+ 
                 const openEditModal = (project) => {
                     formProject.value = { ...project };
+                    ddlPending.value = !project.ddl || project.ddl === '待定';
                     followUpNote.value = "";
                     showEditModal.value = true;
                 };
-
+ 
                 const submitEditProject = async () => {
                     const idx = projects.value.findIndex(p => p.id === formProject.value.id);
                     if (idx !== -1) {
                         if (formProject.value.completedCount > formProject.value.totalCount) {
                             formProject.value.completedCount = formProject.value.totalCount;
                         }
-
+ 
                         const oldProj = projects.value[idx];
+                        const finalDdl = ddlPending.value ? "" : formProject.value.ddl;
                         const newProj = {
                             ...formProject.value,
+                            ddl: finalDdl,
                             lastUpdatedBy: loggedUser.value,
                             lastUpdatedAt: new Date().toISOString()
                         };
-                        
+                         
                         projects.value[idx] = newProj;
                         saveProjectsToLocal();
-
+ 
                         // Cloud update
                         if (isCloudMode.value && supabaseClient.value) {
                             try {
@@ -1828,7 +1909,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                         total_count: newProj.totalCount,
                                         completed_count: newProj.completedCount,
                                         banner_count: newProj.bannerCount,
-                                        ddl: newProj.ddl,
+                                        ddl: finalDdl || null,
                                         assignee: newProj.assignee,
                                         link: newProj.link,
                                         password: newProj.password,
@@ -2019,7 +2100,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 total_count: p.totalCount,
                                 completed_count: p.completedCount,
                                 banner_count: p.bannerCount,
-                                ddl: p.ddl,
+                                ddl: (p.ddl && p.ddl !== '待定') ? p.ddl : null,
                                 assignee: p.assignee,
                                 link: p.link,
                                 password: p.password,
@@ -2206,6 +2287,8 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     getActionLabel,
                     getLogNodeColorClass,
                     clearLogs,
+                    updateProjectProgressDirectly,
+                    ddlPending,
                     // Cloud settings
                     showCloudModal,
                     isCloudMode,
