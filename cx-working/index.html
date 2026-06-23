@@ -106,6 +106,52 @@
         [v-cloak] {
             display: none;
         }
+        /* Modal transitions */
+        .modal-fade-enter-active, .modal-fade-leave-active {
+            transition: opacity 0.25s ease;
+        }
+        .modal-fade-enter-from, .modal-fade-leave-to {
+            opacity: 0;
+        }
+        /* Toast transitions */
+        .toast-fade-enter-active, .toast-fade-leave-active {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .toast-fade-enter-from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+        .toast-fade-leave-to {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        @keyframes scaleUp {
+            0% { transform: scale(0.6); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .animate-scale-up {
+            animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        .jira-scroll-surface {
+            cursor: grab;
+            user-select: none;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+        .jira-scroll-surface::-webkit-scrollbar {
+            display: none;
+        }
+        .jira-scroll-surface.is-dragging-scroll {
+            cursor: grabbing;
+            scroll-behavior: auto;
+        }
+        .jira-scroll-surface input,
+        .jira-scroll-surface select,
+        .jira-scroll-surface button,
+        .jira-scroll-surface a,
+        .jira-scroll-surface [draggable="true"] {
+            user-select: auto;
+        }
     </style>
 </head>
 <body class="transition-colors duration-300">
@@ -284,13 +330,26 @@
                     <!-- Bento Grid Dashboard -->
                     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
                         <!-- Global Stats Card -->
-                        <div class="glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-row items-center justify-between shadow-sm">
+                        <div class="glass-panel rounded-2xl p-5 relative overflow-hidden flex flex-row items-center justify-between shadow-sm">
                             <div class="absolute -right-8 -top-8 w-24 h-24 bg-blue-500/10 rounded-full blur-xl pointer-events-none"></div>
                             <div class="flex-1 pr-4">
                                 <h2 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-widest mb-1 font-outfit">GLOBAL PROGRESS / 全局进度</h2>
-                                <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white font-outfit mt-1">{{ totalActiveWorkload.remainingSets }} <span class="text-sm font-medium text-slate-450 dark:text-slate-500">款未完工</span></h3>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">在做项目数: <span class="text-slate-900 dark:text-white font-bold">{{ activeProjectsCount }}</span></p>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">总计款数要求: <span class="text-slate-900 dark:text-white font-bold">{{ totalActiveWorkload.totalSets }} 款</span></p>
+                                <h3 class="text-3xl font-extrabold text-slate-900 dark:text-white font-outfit mt-1">{{ totalActiveWorkload.remainingSets }} <span class="text-sm font-medium text-slate-450 dark:text-slate-500">款待推进</span></h3>
+                                <div class="grid grid-cols-3 gap-2 mt-4">
+                                    <div class="rounded-lg bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-850 px-2.5 py-2">
+                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-bold">制作未完</div>
+                                        <div class="text-sm text-slate-900 dark:text-white font-extrabold font-outfit">{{ totalActiveWorkload.inProductionRemainingSets }}</div>
+                                    </div>
+                                    <div class="rounded-lg bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-850 px-2.5 py-2">
+                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-bold">等待素材</div>
+                                        <div class="text-sm text-slate-900 dark:text-white font-extrabold font-outfit">{{ totalActiveWorkload.waitingRemainingSets }}</div>
+                                    </div>
+                                    <div class="rounded-lg bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-850 px-2.5 py-2">
+                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-bold">活跃项目</div>
+                                        <div class="text-sm text-slate-900 dark:text-white font-extrabold font-outfit">{{ activeProjectsCount }}</div>
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-slate-500 dark:text-slate-400 mt-2">总计需求 {{ totalActiveWorkload.totalSets }} 款，等待素材不等于制作逾期，已单独列出。</p>
                             </div>
                             <div class="relative flex items-center justify-center w-24 h-24 shrink-0">
                                 <!-- SVG Circular Donut Progress -->
@@ -328,17 +387,32 @@
                         </div>
 
                         <!-- Urgent Tasks Card -->
-                        <div class="glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-sm">
-                            <div class="absolute -right-8 -top-8 w-24 h-24 bg-rose-500/10 rounded-full blur-xl pointer-events-none"></div>
+                        <div class="glass-panel rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between shadow-sm border-rose-200/90 dark:border-rose-900/40">
+                            <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-rose-600 via-orange-400 to-transparent pointer-events-none"></div>
+                            <div class="absolute -right-8 -top-8 w-28 h-28 bg-rose-500/15 rounded-full blur-xl pointer-events-none"></div>
                             <div>
-                                <h2 class="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest mb-3 font-outfit">URGENT REMINDERS / 加急项目</h2>
+                                <div class="flex items-center justify-between mb-3">
+                                    <h2 class="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-widest font-outfit">URGENT REMINDERS / 加急项目</h2>
+                                    <span v-if="urgentProjects.length > 0" class="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-rose-600 text-white text-[10px] font-extrabold shadow-sm shadow-rose-500/20">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
+                                        {{ urgentProjects.length }} 项临期
+                                    </span>
+                                </div>
                                 <div class="space-y-2 max-h-[140px] overflow-y-auto pr-1">
-                                    <div v-for="p in urgentProjects" :key="p.id" class="flex items-center justify-between p-2 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/40 rounded-lg animate-pulse-slow">
-                                        <div class="flex flex-col min-w-0">
-                                            <span class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{{ p.name }}</span>
-                                            <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{{ p.assignee }} · 剩 {{ p.totalCount - p.completedCount }} 款</span>
+                                    <div v-for="p in urgentProjects" :key="p.id" class="relative flex items-center justify-between gap-3 p-3 bg-gradient-to-r from-rose-50 to-orange-50/60 dark:from-rose-950/30 dark:to-orange-950/10 border border-rose-300 dark:border-rose-800/70 rounded-lg shadow-sm shadow-rose-100/70 dark:shadow-none">
+                                        <div class="absolute left-0 top-2 bottom-2 w-1 rounded-r-full bg-rose-600"></div>
+                                        <div class="flex items-center gap-2 min-w-0 pl-1.5">
+                                            <div class="w-7 h-7 rounded-lg bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-sm shadow-rose-500/30">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                                </svg>
+                                            </div>
+                                            <div class="flex flex-col min-w-0">
+                                                <span class="text-xs font-extrabold text-slate-900 dark:text-white truncate">{{ p.name }}</span>
+                                                <span class="text-[10px] text-rose-700 dark:text-rose-300 font-bold">{{ p.assignee }} · 剩 {{ p.totalCount - p.completedCount }} 款未完成</span>
+                                            </div>
                                         </div>
-                                        <span class="text-[10px] font-bold font-outfit px-2 py-0.5 bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30 rounded-md whitespace-nowrap shrink-0">
+                                        <span class="text-[10px] font-extrabold font-outfit px-2.5 py-1 bg-white dark:bg-rose-950/70 text-rose-700 dark:text-rose-200 border border-rose-300 dark:border-rose-700 rounded-md whitespace-nowrap shrink-0 shadow-sm">
                                             {{ getDaysRemainingText(p.ddl) }}
                                         </span>
                                     </div>
@@ -408,14 +482,42 @@
                         
                         <!-- Main Board/List Content (Col Span 4) -->
                         <div class="lg:col-span-4 min-w-0">
+                            <div class="glass-panel rounded-2xl mb-4 px-4 py-3 flex items-center justify-between shadow-sm">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                                        </svg>
+                                    </div>
+                                    <div class="min-w-0">
+                                        <h2 class="text-sm font-extrabold text-slate-900 dark:text-white">项目需求工作区</h2>
+                                        <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">按住空白处左右拖动查看，列内上下滚动；等待素材已从制作未完中拆分。</p>
+                                    </div>
+                                </div>
+                                <button @click="isWorkspaceCollapsed = !isWorkspaceCollapsed" class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 transition-transform" :class="{'rotate-180': !isWorkspaceCollapsed}" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
+                                    </svg>
+                                    {{ isWorkspaceCollapsed ? '展开' : '收起' }}
+                                </button>
+                            </div>
+                            <div v-if="isWorkspaceCollapsed" class="glass-panel rounded-2xl p-5 text-sm text-slate-500 dark:text-slate-400 shadow-sm">
+                                工作区已收起，当前筛选下共有 <span class="font-extrabold text-slate-900 dark:text-white">{{ filteredProjects.length }}</span> 个项目。
+                            </div>
+                            <div v-else>
                             <!-- Kanban View -->
-                            <div v-if="viewMode === 'kanban'" class="overflow-x-auto pb-4">
-                                <div class="flex gap-4 min-w-max lg:min-w-[1720px]">
+                            <div v-if="viewMode === 'kanban'" 
+                                 class="jira-scroll-surface overflow-x-auto pb-3"
+                                 @mousedown="startHorizontalScroll"
+                                 @mousemove="moveHorizontalScroll"
+                                 @mouseup="stopHorizontalScroll"
+                                 @mouseleave="stopHorizontalScroll">
+                                <div class="flex gap-3 min-w-max lg:min-w-[1680px] h-[calc(100vh-360px)] min-h-[540px] max-h-[760px]">
                                     <!-- Kanban Columns -->
                                     <div v-for="col in kanbanColumns" :key="col.status" 
                                          @dragover.prevent 
                                          @drop="handleCardDrop(col.status)"
-                                         class="flex-1 min-w-[245px] flex flex-col bg-slate-200/40 dark:bg-slate-900/25 border border-slate-200 dark:border-slate-800/40 rounded-2xl p-3 min-h-[600px] transition-colors duration-200"
+                                         class="flex-1 min-w-[235px] flex flex-col bg-slate-200/40 dark:bg-slate-900/25 border border-slate-200 dark:border-slate-800/40 rounded-lg p-3 h-full transition-colors duration-200"
                                          :class="{'bg-slate-200 dark:bg-slate-900/70 border-violet-500/20': dragOverColumn === col.status}">
                                         
                                         <!-- Column Header -->
@@ -430,7 +532,7 @@
                                         </div>
 
                                         <!-- Column Cards -->
-                                        <div class="flex-1 space-y-3 overflow-y-auto">
+                                        <div class="flex-1 space-y-3 overflow-y-auto pr-1">
                                             <div v-for="project in col.projects" :key="project.id" 
                                                  draggable="true" 
                                                  @dragstart="handleCardDragStart(project)"
@@ -513,19 +615,35 @@
 
                                                 <!-- Document Link & Password -->
                                                 <div class="flex items-center gap-1.5 mb-3 pt-2.5 border-t border-slate-200 dark:border-slate-850/80 ml-1.5">
-                                                    <button v-if="project.link" @click.stop="copyText(project.link, '链接')" class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-850 transition-colors" title="一键复制文档链接">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <button v-if="project.link" @click.stop="copyText(project.link, '链接', project.id, 'link')" 
+                                                            class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm" 
+                                                            :class="copiedStates[project.id + '-link']
+                                                                    ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02] shadow-emerald-100/50 dark:shadow-none'
+                                                                    : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-850'"
+                                                            title="一键复制文档链接">
+                                                        <svg v-if="copiedStates[project.id + '-link']" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                                                         </svg>
-                                                        复制链接
+                                                        <span>{{ copiedStates[project.id + '-link'] ? '已复制' : '复制链接' }}</span>
                                                     </button>
                                                     <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1">无链接</span>
 
-                                                    <button v-if="project.password" @click.stop="copyText(project.password, '密码')" class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 rounded-lg text-[10px] font-semibold border border-slate-200 dark:border-slate-850 transition-colors" title="一键复制密码">
-                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                    <button v-if="project.password" @click.stop="copyText(project.password, '密码', project.id, 'password')" 
+                                                            class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm" 
+                                                            :class="copiedStates[project.id + '-password']
+                                                                    ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02] shadow-emerald-100/50 dark:shadow-none'
+                                                                    : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-850'"
+                                                            title="一键复制密码">
+                                                        <svg v-if="copiedStates[project.id + '-password']" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        </svg>
+                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m9-3h-3m3 3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                         </svg>
-                                                        密码: {{ project.password }}
+                                                        <span>{{ copiedStates[project.id + '-password'] ? '已复制' : '密码: ' + project.password }}</span>
                                                     </button>
                                                     <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1">无密码</span>
                                                 </div>
@@ -569,8 +687,12 @@
                             </div>
 
                             <!-- List/Table View -->
-                            <div v-if="viewMode === 'list'" class="glass-panel rounded-2xl overflow-hidden shadow-sm">
-                                <div class="overflow-x-auto">
+                            <div v-if="viewMode === 'list'" class="glass-panel rounded-lg overflow-hidden shadow-sm">
+                                <div class="jira-scroll-surface overflow-auto max-h-[calc(100vh-360px)] min-h-[420px]"
+                                     @mousedown="startHorizontalScroll"
+                                     @mousemove="moveHorizontalScroll"
+                                     @mouseup="stopHorizontalScroll"
+                                     @mouseleave="stopHorizontalScroll">
                                     <table class="w-full text-left border-collapse">
                                         <thead>
                                             <tr class="bg-slate-100 dark:bg-slate-955/70 border-b border-slate-200 dark:border-slate-800/60 text-xs font-bold text-slate-555 dark:text-slate-400 tracking-wider whitespace-nowrap">
@@ -618,48 +740,63 @@
                                                     </div>
                                                 </td>
                                                 <td class="py-4 px-6 font-outfit text-slate-700 dark:text-slate-300 font-semibold whitespace-nowrap">{{ project.bannerCount }}</td>
-                                                <td class="py-4 px-6 whitespace-nowrap">
-                                                    <span :class="['font-outfit text-xs px-2 py-0.5 rounded border font-semibold whitespace-nowrap', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20' : 'bg-slate-100 dark:bg-slate-955 text-slate-555 dark:text-slate-400 border-slate-250 dark:border-slate-800']">
-                                                        {{ project.ddl || '待定' }}
-                                                    </span>
-                                                </td>
-                                                <td class="py-4 px-6 whitespace-nowrap">
-                                                    <div class="flex flex-col gap-1 justify-center">
-                                                        <div class="flex items-center gap-2">
-                                                            <img :src="getMemberAvatar(project.assignee)" class="w-6 h-6 rounded-full object-cover border border-slate-200 dark:border-slate-800" :alt="project.assignee">
-                                                            <span class="text-slate-750 dark:text-slate-250 font-bold">{{ project.assignee }}</span>
-                                                        </div>
-                                                        <div v-if="project.coWorkers && project.coWorkers.length > 0" class="flex items-center -space-x-1.5 overflow-hidden pl-0.5" title="配合成员">
-                                                            <span class="text-[9px] text-slate-400 dark:text-slate-500 mr-1.5 shrink-0">配合:</span>
-                                                            <img v-for="worker in project.coWorkers" :key="worker" :src="getMemberAvatar(worker)" class="inline-block w-4 h-4 rounded-full object-cover ring-1 ring-white dark:ring-slate-900 border border-slate-200 dark:border-slate-800" :alt="worker" :title="worker">
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td class="py-4 px-6 whitespace-nowrap">
-                                                    <div class="flex items-center gap-2 flex-wrap max-w-[220px]">
-                                                        <button v-if="project.link" @click="copyText(project.link, '链接')" class="cursor-pointer p-1.5 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-violet-650 dark:hover:text-violet-400 rounded-lg hover:border-violet-500/30 transition-all duration-200" title="复制文档链接">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                                            </svg>
-                                                        </button>
-                                                        <button v-if="project.password" @click="copyText(project.password, '密码')" class="cursor-pointer p-1.5 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-cyan-650 dark:hover:text-cyan-400 rounded-lg hover:border-cyan-500/30 transition-all duration-200" :title="'复制密码: ' + project.password">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m9-3h-3m3 3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                            </svg>
-                                                        </button>
+                                                <td class="py-4 px-6 whitespace-nowrap text-xs text-slate-600 dark:text-slate-300">{{ project.ddl || '待定' }}</td>
+                                                 <td class="py-4 px-6 whitespace-nowrap">
+                                                     <div class="flex flex-col gap-1 justify-center">
+                                                         <div class="flex items-center gap-2">
+                                                             <img :src="getMemberAvatar(project.assignee)" class="w-6 h-6 rounded-full object-cover border border-slate-200 dark:border-slate-800" :alt="project.assignee">
+                                                             <span class="text-slate-750 dark:text-slate-250 font-bold">{{ project.assignee }}</span>
+                                                         </div>
+                                                         <div v-if="project.coWorkers && project.coWorkers.length > 0" class="flex items-center -space-x-1.5 overflow-hidden pl-0.5" title="配合成员">
+                                                             <span class="text-[9px] text-slate-400 dark:text-slate-500 mr-1.5 shrink-0">配合:</span>
+                                                             <img v-for="worker in project.coWorkers" :key="worker" :src="getMemberAvatar(worker)" class="inline-block w-4 h-4 rounded-full object-cover ring-1 ring-white dark:ring-slate-900 border border-slate-200 dark:border-slate-800" :alt="worker" :title="worker">
+                                                         </div>
+                                                     </div>
+                                                 </td>
+                                                 <td class="py-4 px-6 whitespace-nowrap">
+                                                     <div class="flex items-center gap-1.5 flex-wrap max-w-[280px]">
+                                                         <!-- Copy Link Button -->
+                                                         <button v-if="project.link" @click="copyText(project.link, '链接', project.id, 'link')" 
+                                                                 class="relative cursor-pointer p-1.5 border rounded-lg transition-all duration-300 shadow-sm"
+                                                                 :class="copiedStates[project.id + '-link']
+                                                                         ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-105 shadow-emerald-100/50 dark:shadow-none'
+                                                                         : 'bg-violet-50 hover:bg-violet-100 dark:bg-violet-955/20 dark:hover:bg-violet-905/40 border-violet-200/65 dark:border-violet-800/60 text-violet-600 dark:text-violet-400 hover:border-violet-400 dark:hover:border-violet-700'"
+                                                                 :title="copiedStates[project.id + '-link'] ? '已复制！' : '复制文档链接'">
+                                                             <svg v-if="copiedStates[project.id + '-link']" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                             </svg>
+                                                             <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                             </svg>
+                                                         </button>
 
-                                                        <!-- Attachments in List View -->
-                                                        <div v-if="project.attachments && project.attachments.length > 0" class="flex flex-wrap gap-1 items-center">
-                                                            <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" download class="inline-flex items-center gap-0.5 py-1 px-1.5 bg-violet-50 dark:bg-violet-955/40 hover:bg-violet-100 dark:hover:bg-violet-900/60 border border-violet-200/50 dark:border-violet-800/30 text-[10px] text-violet-650 dark:text-violet-400 font-semibold rounded-lg transition-colors max-w-full" :title="file.name">
-                                                                <svg xmlns="http://www.w3.org/2000/svg" class="w-2.5 h-2.5 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                                                                </svg>
-                                                                <span class="truncate max-w-[60px]">{{ file.name }}</span>
-                                                            </a>
-                                                        </div>
+                                                         <!-- Copy Password Button -->
+                                                         <button v-if="project.password" @click="copyText(project.password, '密码', project.id, 'password')" 
+                                                                 class="relative cursor-pointer p-1.5 border rounded-lg transition-all duration-300 shadow-sm"
+                                                                 :class="copiedStates[project.id + '-password']
+                                                                         ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-105 shadow-emerald-100/50 dark:shadow-none'
+                                                                         : 'bg-cyan-50 hover:bg-cyan-100 dark:bg-cyan-955/20 dark:hover:bg-cyan-905/40 border-cyan-200/65 dark:border-cyan-800/60 text-cyan-600 dark:text-cyan-400 hover:border-cyan-400 dark:hover:border-cyan-700'"
+                                                                 :title="copiedStates[project.id + '-password'] ? '密码已复制！' : '复制密码: ' + project.password">
+                                                             <svg v-if="copiedStates[project.id + '-password']" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                             </svg>
+                                                             <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m9-3h-3m3 3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                             </svg>
+                                                         </button>
 
-                                                        <span v-if="!project.link && !project.password && (!project.attachments || project.attachments.length === 0)" class="text-xs text-slate-400 dark:text-slate-650">-</span>
-                                                    </div>
+                                                         <!-- Attachments in List View -->
+                                                         <div v-if="project.attachments && project.attachments.length > 0" class="flex flex-wrap gap-1 items-center">
+                                                             <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" download class="inline-flex items-center gap-1 py-1.5 px-2.5 bg-violet-50/50 dark:bg-violet-955/20 hover:bg-violet-100 dark:hover:bg-violet-900/40 border border-violet-200/40 dark:border-violet-800/20 text-[10px] text-violet-600 dark:text-violet-400 font-semibold rounded-xl transition-colors max-w-full" :title="file.name">
+                                                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                                                 </svg>
+                                                                 <span class="truncate max-w-[80px]">{{ file.name }}</span>
+                                                             </a>
+                                                         </div>
+
+                                                         <span v-if="!project.link && !project.password && (!project.attachments || project.attachments.length === 0)" class="text-xs text-slate-400 dark:text-slate-650">-</span>
+                                                     </div>
                                                 </td>
                                                 <td class="py-4 px-6 text-right text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                                     <div class="font-medium text-slate-705 dark:text-slate-300">{{ getRelativeTimeText(project.lastUpdatedAt) }}</div>
@@ -693,6 +830,7 @@
                                         </tbody>
                                     </table>
                                 </div>
+                            </div>
                             </div>
                         </div>
 
@@ -1086,7 +1224,11 @@
                                 <div class="space-y-2">
                                     <div class="flex items-center justify-between">
                                         <label class="block text-xs font-bold text-slate-500 dark:text-slate-400">步骤：一键建表 SQL 脚本</label>
-                                        <button @click="copyText(sqlInitScript, 'SQL建表脚本')" class="cursor-pointer text-[10px] text-violet-600 dark:text-violet-400 font-bold hover:underline">复制代码</button>
+                                        <button @click="copyText(sqlInitScript, 'SQL建表脚本', 'sql', 'script')" 
+                                                class="cursor-pointer text-[10px] font-bold hover:underline transition-all duration-300"
+                                                :class="copiedStates['sql-script'] ? 'text-emerald-600 dark:text-emerald-450' : 'text-violet-600 dark:text-violet-400'">
+                                            {{ copiedStates['sql-script'] ? '已复制！✓' : '复制代码' }}
+                                        </button>
                                     </div>
                                     <p class="text-[10px] text-slate-400 dark:text-slate-500">提示：在您的 Supabase 项目后台，进入 <b>SQL Editor</b>，新建一个 Query，粘贴下方代码并运行 <b>RUN</b> 即可自动建表：</p>
                                     <pre class="bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl p-3 text-[10px] text-slate-600 dark:text-slate-400 font-mono overflow-x-auto max-h-[160px]">{{ sqlInitScript }}</pre>
@@ -1102,6 +1244,40 @@
                 </transition>
 
             </div>
+        </div>
+        
+        <!-- Toast Notification Container -->
+        <div class="fixed top-20 right-6 z-[9999] flex flex-col gap-2 pointer-events-none w-[min(360px,calc(100vw-32px))]">
+            <transition-group name="toast-fade">
+                <div v-for="toast in toasts" :key="toast.id" 
+                     class="pointer-events-auto flex items-start gap-3 px-4 py-3 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border rounded-xl shadow-xl transition-all duration-300"
+                     :class="toast.type === 'error' ? 'border-rose-200 dark:border-rose-800 shadow-rose-950/10' : toast.type === 'info' ? 'border-blue-200 dark:border-blue-800 shadow-blue-950/10' : 'border-emerald-200 dark:border-emerald-800 shadow-emerald-950/10'">
+                    <!-- Icon Success -->
+                    <div v-if="toast.type === 'success'" class="w-6 h-6 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <!-- Icon Error -->
+                    <div v-else-if="toast.type === 'error'" class="w-6 h-6 rounded-full bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </div>
+                    <!-- Icon Info -->
+                    <div v-else class="w-6 h-6 rounded-full bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div class="min-w-0">
+                        <div class="text-[10px] font-extrabold uppercase tracking-wider" :class="toast.type === 'error' ? 'text-rose-600 dark:text-rose-400' : toast.type === 'info' ? 'text-blue-600 dark:text-blue-400' : 'text-emerald-600 dark:text-emerald-400'">
+                            {{ toast.type === 'error' ? '操作失败' : toast.type === 'info' ? '处理中' : '操作成功' }}
+                        </div>
+                        <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 leading-5 break-words">{{ toast.text }}</div>
+                    </div>
+                </div>
+            </transition-group>
         </div>
     </div>
 
@@ -1334,16 +1510,23 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 const filterAssignee = ref("");
                 const filterStatus = ref("");
                 const viewMode = ref("kanban");
+                const isWorkspaceCollapsed = ref(false);
                 
                 // Modals
                 const showBackupDropdown = ref(false);
                 const showAddModal = ref(false);
                 const showEditModal = ref(false);
                 const toasts = ref([]);
+                const copiedStates = ref({});
                 
                 // Drag & Drop
                 const draggingProject = ref(null);
                 const dragOverColumn = ref(null);
+                const horizontalScrollState = {
+                    active: false,
+                    startX: 0,
+                    scrollLeft: 0
+                };
 
                 // Forms
                 const formProject = ref({
@@ -1673,24 +1856,41 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
 
                 // Statistics Calculators
                 const activeProjectsCount = computed(() => {
-                    return projects.value.filter(p => p.status !== 'completed' && p.status !== 'shelved').length;
+                    return projects.value.filter(p => !['completed', 'shelved', 'waiting_materials'].includes(p.status)).length;
                 });
 
                 const totalActiveWorkload = computed(() => {
                     let total = 0;
                     let completed = 0;
+                    let waitingTotal = 0;
+                    let waitingCompleted = 0;
+                    let inProductionTotal = 0;
+                    let inProductionCompleted = 0;
                     projects.value.forEach(p => {
                         if (p.status !== 'completed' && p.status !== 'shelved') {
                             total += p.totalCount;
                             completed += p.completedCount;
+                            if (p.status === 'waiting_materials') {
+                                waitingTotal += p.totalCount;
+                                waitingCompleted += p.completedCount;
+                            } else {
+                                inProductionTotal += p.totalCount;
+                                inProductionCompleted += p.completedCount;
+                            }
                         }
                     });
                     const remaining = total - completed;
+                    const waitingRemaining = waitingTotal - waitingCompleted;
+                    const inProductionRemaining = inProductionTotal - inProductionCompleted;
                     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
                     return {
                         totalSets: total,
                         completedSets: completed,
                         remainingSets: remaining,
+                        waitingRemainingSets: waitingRemaining,
+                        inProductionRemainingSets: inProductionRemaining,
+                        waitingTotalSets: waitingTotal,
+                        inProductionTotalSets: inProductionTotal,
                         percentage: percentage
                     };
                 });
@@ -1698,7 +1898,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 const members = computed(() => {
                     return users.value.map(user => {
                         const name = user.username;
-                        const memberProjects = projects.value.filter(p => p.assignee === name && p.status !== 'completed' && p.status !== 'shelved');
+                        const memberProjects = projects.value.filter(p => p.assignee === name && !['completed', 'shelved', 'waiting_materials'].includes(p.status));
                         let remaining = 0;
                         memberProjects.forEach(p => {
                             remaining += (p.totalCount - p.completedCount);
@@ -1870,6 +2070,31 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     filterStatus.value = "";
                 };
 
+                const canStartHorizontalScroll = (target) => {
+                    return !target.closest('button, input, select, textarea, a, [draggable="true"]');
+                };
+
+                const startHorizontalScroll = (event) => {
+                    if (event.button !== 0 || !canStartHorizontalScroll(event.target)) return;
+                    horizontalScrollState.active = true;
+                    horizontalScrollState.startX = event.pageX - event.currentTarget.offsetLeft;
+                    horizontalScrollState.scrollLeft = event.currentTarget.scrollLeft;
+                    event.currentTarget.classList.add('is-dragging-scroll');
+                };
+
+                const moveHorizontalScroll = (event) => {
+                    if (!horizontalScrollState.active) return;
+                    event.preventDefault();
+                    const x = event.pageX - event.currentTarget.offsetLeft;
+                    const walk = x - horizontalScrollState.startX;
+                    event.currentTarget.scrollLeft = horizontalScrollState.scrollLeft - walk;
+                };
+
+                const stopHorizontalScroll = (event) => {
+                    horizontalScrollState.active = false;
+                    event.currentTarget.classList.remove('is-dragging-scroll');
+                };
+
                 const getProgressPercentage = (project) => {
                     if (project.totalCount === 0) return 0;
                     return Math.round((project.completedCount / project.totalCount) * 100);
@@ -1942,10 +2167,17 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     showToast(`项目 #${project.id} 完成度已更新至 ${newVal}/${project.totalCount}`);
                 };
 
-                const copyText = (text, label) => {
+                const copyText = (text, label, id, field) => {
                     if (!text) return;
                     navigator.clipboard.writeText(text).then(() => {
                         showToast(`已成功复制${label}到剪贴板！`, "success");
+                        if (id && field) {
+                            const key = `${id}-${field}`;
+                            copiedStates.value[key] = true;
+                            setTimeout(() => {
+                                copiedStates.value[key] = false;
+                            }, 2000);
+                        }
                     }).catch(() => {
                         showToast(`复制${label}失败，请手动选择复制。`, "error");
                     });
@@ -2510,6 +2742,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     filterAssignee,
                     filterStatus,
                     viewMode,
+                    isWorkspaceCollapsed,
                     showBackupDropdown,
                     showAddModal,
                     showEditModal,
@@ -2537,6 +2770,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     updateProjectStatus,
                     adjustProgress,
                     copyText,
+                    copiedStates,
                     getProgressPercentage,
                     getMemberColorClass,
                     getMemberAvatar,
@@ -2548,6 +2782,9 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     getDaysRemainingText,
                     isUrgent,
                     resetFilters,
+                    startHorizontalScroll,
+                    moveHorizontalScroll,
+                    stopHorizontalScroll,
                     handleCardDragStart,
                     handleCardDragEnd,
                     handleCardDrop,
