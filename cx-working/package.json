@@ -1,0 +1,16 @@
+{
+  "name": "ecommerce-pm-platform",
+  "version": "1.0.0",
+  "description": "跨境电商视觉设计项目管理平台",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx -y http-server -p 8080 -o",
+    "build": "node build.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vercel": "^54.14.5"
+  }
+}
