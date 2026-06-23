@@ -121,11 +121,7 @@
                 <div v-if="currentView === 'login'" class="min-h-[85vh] flex flex-col items-center justify-center relative z-20 py-12">
                     <!-- Brand header above login box -->
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="p-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl shadow-md">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-                            </svg>
-                        </div>
+                        <img src="bea37665d260b15a324284add4837a05.png" alt="春序 Logo" class="w-12 h-12 object-contain rounded-xl shadow-sm">
                         <div>
                             <h1 class="text-2xl font-black font-outfit bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 tracking-wide">春序视觉设计</h1>
                             <p class="text-[9px] text-slate-400 dark:text-slate-500 font-bold mt-0.5 tracking-widest uppercase">SPRING SEQUENCE VISUAL DESIGN</p>
@@ -135,7 +131,7 @@
                     <!-- Login Box -->
                     <div class="w-full max-w-md bg-white/90 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200 dark:border-slate-800/80 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
                         <!-- Theme Toggle in Login page -->
-                        <div class="absolute right-6 top-6">
+                        <div class="absolute right-6 top-6 z-50">
                             <button @click="toggleTheme" class="cursor-pointer p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all">
                                 <svg v-if="isDarkMode" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
@@ -147,8 +143,8 @@
                         </div>
 
                         <!-- Inner decoration -->
-                        <div class="absolute -right-16 -top-16 w-32 h-32 bg-blue-600/10 rounded-full blur-2xl"></div>
-                        <div class="absolute -left-16 -bottom-16 w-32 h-32 bg-cyan-600/10 rounded-full blur-2xl"></div>
+                        <div class="absolute -right-16 -top-16 w-32 h-32 bg-blue-600/10 rounded-full blur-2xl pointer-events-none"></div>
+                        <div class="absolute -left-16 -bottom-16 w-32 h-32 bg-cyan-600/10 rounded-full blur-2xl pointer-events-none"></div>
 
                         <!-- Tabs -->
                         <div class="flex border-b border-slate-200 dark:border-slate-800 mb-6">
@@ -209,11 +205,7 @@
                     <header class="flex flex-col md:flex-row md:items-center md:justify-between mb-8 pb-6 border-b border-slate-200 dark:border-slate-800/60">
                         <div>
                             <div class="flex items-center gap-3">
-                                <div class="p-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white rounded-xl shadow-md">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m12.728 12.728l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z" />
-                                    </svg>
-                                </div>
+                                <img src="bea37665d260b15a324284add4837a05.png" alt="春序 Logo" class="w-10 h-10 object-contain rounded-xl shadow-md">
                                 <div>
                                     <h1 class="text-2xl font-extrabold font-outfit bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-cyan-500 dark:from-blue-400 dark:to-cyan-400 tracking-tight">春序视觉设计项目管理平台</h1>
                                     <p class="text-[9px] text-slate-400 dark:text-slate-500 font-bold mt-0.5 tracking-widest uppercase">SPRING SEQUENCE VISUAL DESIGN WORKFLOW HUB</p>
@@ -242,8 +234,8 @@
                             </button>
 
                             <!-- Current User Display -->
-                            <div class="flex items-center gap-2 px-3 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-600 dark:text-slate-300 text-xs shadow-sm">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <div class="flex items-center gap-2 px-3 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-600 dark:text-slate-300 text-xs shadow-sm">
+                                <img :src="getMemberAvatar(loggedUser)" class="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-700" :alt="loggedUser">
                                 <span class="font-medium">在线: <span class="text-slate-900 dark:text-white font-bold">{{ loggedUser }}</span></span>
                             </div>
 
@@ -321,7 +313,7 @@
                                 <div v-for="member in members" :key="member.name" class="flex flex-col">
                                     <div class="flex items-center justify-between text-xs mb-1">
                                         <div class="flex items-center gap-2">
-                                            <span class="w-2.5 h-2.5 rounded-full" :class="getMemberColorClass(member.name)"></span>
+                                            <img :src="getMemberAvatar(member.name)" class="w-6 h-6 rounded-full object-cover border border-slate-200 dark:border-slate-800" :alt="member.name">
                                             <span class="font-bold text-slate-800 dark:text-slate-200">{{ member.name }}</span>
                                             <span class="text-[10px] text-slate-400 dark:text-slate-500">({{ member.taskCount }} 项目)</span>
                                         </div>
@@ -346,7 +338,7 @@
                                             <span class="text-xs font-bold text-slate-800 dark:text-slate-200 truncate">{{ p.name }}</span>
                                             <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">{{ p.assignee }} · 剩 {{ p.totalCount - p.completedCount }} 款</span>
                                         </div>
-                                        <span class="text-[10px] font-bold font-outfit px-2 py-0.5 bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30 rounded-md">
+                                        <span class="text-[10px] font-bold font-outfit px-2 py-0.5 bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-300 dark:border-rose-500/30 rounded-md whitespace-nowrap shrink-0">
                                             {{ getDaysRemainingText(p.ddl) }}
                                         </span>
                                     </div>
@@ -466,23 +458,29 @@
                                                 </h4>
 
                                                 <!-- Parameters -->
-                                                <div class="space-y-2 mb-4 pl-1.5">
-                                                    <div class="flex items-center justify-between text-xs">
-                                                        <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                <div class="space-y-2 mb-4 pl-1.5 text-xs">
+                                                    <div class="flex items-center justify-between gap-2 flex-wrap">
+                                                        <div class="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 font-medium min-w-0">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                                             </svg>
-                                                            <span>{{ project.bannerCount }} 主图 Banner</span>
+                                                            <span class="truncate">{{ project.bannerCount }} 主图 Banner</span>
                                                         </div>
-                                                        <div class="flex items-center gap-1.5">
-                                                            <span class="w-2.5 h-2.5 rounded-full" :class="getMemberColorClass(project.assignee)"></span>
-                                                            <span class="text-slate-700 dark:text-slate-300 font-semibold">{{ project.assignee }}</span>
+                                                        <div class="flex flex-col items-end gap-1 min-w-0">
+                                                            <div class="flex items-center gap-1.5 min-w-0">
+                                                                <img :src="getMemberAvatar(project.assignee)" class="w-5 h-5 rounded-full object-cover border border-slate-200 dark:border-slate-800" :alt="project.assignee">
+                                                                <span class="text-slate-700 dark:text-slate-300 font-semibold truncate">{{ project.assignee }}</span>
+                                                            </div>
+                                                            <div v-if="project.coWorkers && project.coWorkers.length > 0" class="flex items-center -space-x-1.5 overflow-hidden" title="配合成员">
+                                                                <span class="text-[9px] text-slate-400 dark:text-slate-500 mr-1 shrink-0">配合:</span>
+                                                                <img v-for="worker in project.coWorkers" :key="worker" :src="getMemberAvatar(worker)" class="inline-block w-4 h-4 rounded-full object-cover ring-1 ring-white dark:ring-slate-900 border border-slate-200 dark:border-slate-800" :alt="worker" :title="worker">
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     
-                                                    <div class="flex items-center justify-between text-[11px] font-medium">
+                                                    <div class="flex items-center justify-between gap-2 flex-wrap text-[11px] font-medium">
                                                         <span class="text-slate-400 dark:text-slate-500">截止日期 (DDL):</span>
-                                                        <span :class="['font-semibold font-outfit px-1.5 py-0.5 rounded', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20' : 'text-slate-500 dark:text-slate-400']">
+                                                        <span :class="['font-semibold font-outfit px-1.5 py-0.5 rounded whitespace-nowrap shrink-0', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20' : 'text-slate-500 dark:text-slate-400']">
                                                             {{ project.ddl || '待定' }}
                                                         </span>
                                                     </div>
@@ -565,7 +563,7 @@
                                 <div class="overflow-x-auto">
                                     <table class="w-full text-left border-collapse">
                                         <thead>
-                                            <tr class="bg-slate-100 dark:bg-slate-955/70 border-b border-slate-200 dark:border-slate-800/60 text-xs font-bold text-slate-555 dark:text-slate-400 tracking-wider">
+                                            <tr class="bg-slate-100 dark:bg-slate-955/70 border-b border-slate-200 dark:border-slate-800/60 text-xs font-bold text-slate-555 dark:text-slate-400 tracking-wider whitespace-nowrap">
                                                 <th class="py-4 px-6 font-outfit">项目编号</th>
                                                 <th class="py-4 px-6">项目名称</th>
                                                 <th class="py-4 px-6">状态</th>
@@ -580,7 +578,7 @@
                                         </thead>
                                         <tbody class="divide-y divide-slate-150 dark:divide-slate-800/40 text-sm">
                                             <tr v-for="project in filteredProjects" :key="project.id" class="hover:bg-slate-50 dark:hover:bg-slate-850/20 transition-all duration-150">
-                                                <td class="py-4 px-6 font-bold font-outfit text-violet-650 dark:text-violet-400 text-xs">#{{ project.id }}</td>
+                                                <td class="py-4 px-6 font-bold font-outfit text-violet-650 dark:text-violet-400 text-xs whitespace-nowrap">#{{ project.id }}</td>
                                                 <td class="py-4 px-6">
                                                     <span class="font-bold text-slate-800 dark:text-slate-200 hover:text-violet-650 dark:hover:text-white transition-colors cursor-pointer" @click="openEditModal(project)">
                                                         {{ project.name }}
@@ -609,19 +607,25 @@
                                                         <div class="bg-gradient-to-r from-blue-600 to-cyan-400 dark:from-blue-500 dark:to-cyan-400 h-2 rounded-full transition-all duration-300 shadow-sm" :style="{ width: getProgressPercentage(project) + '%' }"></div>
                                                     </div>
                                                 </td>
-                                                <td class="py-4 px-6 font-outfit text-slate-700 dark:text-slate-300 font-semibold">{{ project.bannerCount }}</td>
-                                                <td class="py-4 px-6">
-                                                    <span :class="['font-outfit text-xs px-2 py-0.5 rounded border font-semibold', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20' : 'bg-slate-100 dark:bg-slate-955 text-slate-555 dark:text-slate-400 border-slate-250 dark:border-slate-800']">
+                                                <td class="py-4 px-6 font-outfit text-slate-700 dark:text-slate-300 font-semibold whitespace-nowrap">{{ project.bannerCount }}</td>
+                                                <td class="py-4 px-6 whitespace-nowrap">
+                                                    <span :class="['font-outfit text-xs px-2 py-0.5 rounded border font-semibold whitespace-nowrap', isUrgent(project.ddl) && project.status !== 'completed' && project.status !== 'shelved' ? 'bg-rose-100 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-300 dark:border-rose-500/20' : 'bg-slate-100 dark:bg-slate-955 text-slate-555 dark:text-slate-400 border-slate-250 dark:border-slate-800']">
                                                         {{ project.ddl || '待定' }}
                                                     </span>
                                                 </td>
-                                                <td class="py-4 px-6">
-                                                    <div class="flex items-center gap-2">
-                                                        <span class="w-2.5 h-2.5 rounded-full" :class="getMemberColorClass(project.assignee)"></span>
-                                                        <span class="text-slate-700 dark:text-slate-300 font-semibold">{{ project.assignee }}</span>
+                                                <td class="py-4 px-6 whitespace-nowrap">
+                                                    <div class="flex flex-col gap-1 justify-center">
+                                                        <div class="flex items-center gap-2">
+                                                            <img :src="getMemberAvatar(project.assignee)" class="w-6 h-6 rounded-full object-cover border border-slate-200 dark:border-slate-800" :alt="project.assignee">
+                                                            <span class="text-slate-750 dark:text-slate-250 font-bold">{{ project.assignee }}</span>
+                                                        </div>
+                                                        <div v-if="project.coWorkers && project.coWorkers.length > 0" class="flex items-center -space-x-1.5 overflow-hidden pl-0.5" title="配合成员">
+                                                            <span class="text-[9px] text-slate-400 dark:text-slate-500 mr-1.5 shrink-0">配合:</span>
+                                                            <img v-for="worker in project.coWorkers" :key="worker" :src="getMemberAvatar(worker)" class="inline-block w-4 h-4 rounded-full object-cover ring-1 ring-white dark:ring-slate-900 border border-slate-200 dark:border-slate-800" :alt="worker" :title="worker">
+                                                        </div>
                                                     </div>
                                                 </td>
-                                                <td class="py-4 px-6">
+                                                <td class="py-4 px-6 whitespace-nowrap">
                                                     <div class="flex items-center gap-2">
                                                         <button v-if="project.link" @click="copyText(project.link, '链接')" class="cursor-pointer p-1.5 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-500 hover:text-violet-650 dark:hover:text-violet-400 rounded-lg hover:border-violet-500/30 transition-all duration-200" title="复制文档链接">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -636,7 +640,7 @@
                                                         <span v-if="!project.link && !project.password" class="text-xs text-slate-400 dark:text-slate-600">-</span>
                                                     </div>
                                                 </td>
-                                                <td class="py-4 px-6 text-right text-xs text-slate-500 dark:text-slate-400">
+                                                <td class="py-4 px-6 text-right text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
                                                     <div class="font-medium text-slate-705 dark:text-slate-300">{{ getRelativeTimeText(project.lastUpdatedAt) }}</div>
                                                     <div class="text-[10px] text-slate-400 dark:text-slate-505">by {{ project.lastUpdatedBy || '系统' }}</div>
                                                 </td>
@@ -736,7 +740,7 @@
                                 </button>
                             </div>
                             <form @submit.prevent="submitAddProject" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">项目编号</label>
                                         <input type="text" v-model="formProject.id" required class="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -752,7 +756,17 @@
                                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">项目名称</label>
                                     <input type="text" v-model="formProject.name" required placeholder="如：欧美复古泳衣详情页制作" class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                 </div>
-                                <div class="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">配合的成员</label>
+                                    <div class="flex flex-wrap gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-955/60 border border-slate-200 dark:border-slate-800 rounded-xl min-h-[42px]">
+                                        <label v-for="user in registeredUserNames" :key="user" v-show="user !== formProject.assignee" class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-2.5 py-1 border border-slate-200 dark:border-slate-800/80 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                            <input type="checkbox" :value="user" v-model="formProject.coWorkers" class="rounded border-slate-350 text-blue-600 focus:ring-blue-500">
+                                            <span>{{ user }}</span>
+                                        </label>
+                                        <span v-if="registeredUserNames.filter(u => u !== formProject.assignee).length === 0" class="text-xs text-slate-400 dark:text-slate-550 self-center">无其他成员可供选择</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">要求总套数</label>
                                         <input type="number" v-model.number="formProject.totalCount" min="1" required class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -766,7 +780,7 @@
                                         <input type="number" v-model.number="formProject.bannerCount" min="0" required class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">项目状态</label>
                                         <select v-model="formProject.status" required class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -784,7 +798,7 @@
                                         <input type="date" v-model="formProject.ddl" :disabled="ddlPending" :required="!ddlPending" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all disabled:opacity-50">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">文档/素材链接 (可选)</label>
                                         <input type="url" v-model="formProject.link" placeholder="如百度网盘链接" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -825,7 +839,7 @@
                                 </button>
                             </div>
                             <form @submit.prevent="submitEditProject" class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">项目编号</label>
                                         <input type="text" v-model="formProject.id" disabled class="w-full px-3 py-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-400 dark:text-slate-550 text-sm focus:outline-none transition-all">
@@ -839,9 +853,19 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">项目名称</label>
-                                    <input type="text" v-model="formProject.name" required class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                    <input type="text" v-model="formProject.name" required class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                 </div>
-                                <div class="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">配合的成员</label>
+                                    <div class="flex flex-wrap gap-2 px-3 py-2 bg-slate-50 dark:bg-slate-955/60 border border-slate-200 dark:border-slate-800 rounded-xl min-h-[42px]">
+                                        <label v-for="user in registeredUserNames" :key="user" v-show="user !== formProject.assignee" class="inline-flex items-center gap-1.5 cursor-pointer text-xs font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-900 px-2.5 py-1 border border-slate-200 dark:border-slate-800/80 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                            <input type="checkbox" :value="user" v-model="formProject.coWorkers" class="rounded border-slate-350 text-blue-600 focus:ring-blue-500">
+                                            <span>{{ user }}</span>
+                                        </label>
+                                        <span v-if="registeredUserNames.filter(u => u !== formProject.assignee).length === 0" class="text-xs text-slate-400 dark:text-slate-550 self-center">无其他成员可供选择</span>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">要求总套数</label>
                                         <input type="number" v-model.number="formProject.totalCount" min="1" required class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -855,7 +879,7 @@
                                         <input type="number" v-model.number="formProject.bannerCount" min="0" required class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">项目状态</label>
                                         <select v-model="formProject.status" required class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -873,7 +897,7 @@
                                         <input type="date" v-model="formProject.ddl" :disabled="ddlPending" :required="!ddlPending" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all disabled:opacity-50">
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">文档/素材链接 (可选)</label>
                                         <input type="url" v-model="formProject.link" placeholder="如 百度网盘链接" class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
@@ -1013,6 +1037,7 @@
                         bannerCount: 12,
                         ddl: "2026-06-25",
                         assignee: "俊宇",
+                        coWorkers: [],
                         link: "https://pan.baidu.com/s/1xyzExampleLink",
                         password: "abcd",
                         lastUpdatedBy: "俊宇",
@@ -1027,6 +1052,7 @@
                         bannerCount: 8,
                         ddl: "2026-06-23", 
                         assignee: "小彻",
+                        coWorkers: [],
                         link: "https://pan.baidu.com/s/2uvwExampleLink",
                         password: "efgh",
                         lastUpdatedBy: "小彻",
@@ -1041,6 +1067,7 @@
                         bannerCount: 24,
                         ddl: "2026-06-30",
                         assignee: "陆叶",
+                        coWorkers: [],
                         link: "https://pan.baidu.com/s/3rstExampleLink",
                         password: "ijkl",
                         lastUpdatedBy: "陆叶",
@@ -1055,6 +1082,7 @@
                         bannerCount: 4,
                         ddl: "2026-07-15",
                         assignee: "阿旺",
+                        coWorkers: [],
                         link: "",
                         password: "",
                         lastUpdatedBy: "系统",
@@ -1069,6 +1097,7 @@
                         bannerCount: 10,
                         ddl: "2026-06-24",
                         assignee: "俊宇",
+                        coWorkers: [],
                         link: "https://pan.baidu.com/s/5qweExampleLink",
                         password: "qwer",
                         lastUpdatedBy: "俊宇",
@@ -1140,11 +1169,15 @@ CREATE TABLE cx_projects (
     banner_count INTEGER DEFAULT 5,
     ddl DATE,
     assignee TEXT,
+    co_workers TEXT, -- 配合的成员 (逗号分隔的用户名)
     link TEXT,
     password TEXT,
     last_updated_by TEXT,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
+
+-- 如果表已存在，执行以下语句以升级表：
+-- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS co_workers TEXT;
 
 CREATE TABLE cx_logs (
     id BIGINT PRIMARY KEY,
@@ -1214,7 +1247,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     status: "waiting_materials",
                     totalCount: 100,
                     completedCount: 0,
-                    bannerCount: 5,
+                    bannerCount: 0,
                     ddl: "",
                     assignee: "",
                     link: "",
@@ -1320,6 +1353,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 bannerCount: p.banner_count,
                                 ddl: p.ddl,
                                 assignee: p.assignee,
+                                coWorkers: p.co_workers ? p.co_workers.split(',') : [],
                                 link: p.link,
                                 password: p.password,
                                 lastUpdatedBy: p.last_updated_by,
@@ -1640,6 +1674,14 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     return colors[sum % colors.length];
                 };
 
+                const getMemberAvatar = (name) => {
+                    const knownNames = ["小彻", "阿旺", "俊宇", "陆叶"];
+                    if (name && knownNames.includes(name)) {
+                        return `成员头像/${name}.png`;
+                    }
+                    return "成员头像/新增用户.png";
+                };
+
                 const getStatusBadgeClass = (status) => {
                     const classes = {
                         waiting_materials: "text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-950/80 border-slate-300 dark:border-slate-800",
@@ -1811,9 +1853,10 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                         status: "waiting_materials",
                         totalCount: 100,
                         completedCount: 0,
-                        bannerCount: 5,
+                        bannerCount: 0,
                         ddl: new Date().toISOString().substr(0, 10),
                         assignee: loggedUser.value || "阿旺",
+                        coWorkers: [],
                         link: "",
                         password: ""
                     };
@@ -1856,6 +1899,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                     banner_count: newProj.bannerCount,
                                     ddl: finalDdl || null,
                                     assignee: newProj.assignee,
+                                    co_workers: (newProj.coWorkers && newProj.coWorkers.length > 0) ? newProj.coWorkers.join(',') : null,
                                     link: newProj.link,
                                     password: newProj.password,
                                     last_updated_by: newProj.lastUpdatedBy,
@@ -1873,7 +1917,10 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 };
  
                 const openEditModal = (project) => {
-                    formProject.value = { ...project };
+                    formProject.value = {
+                        ...project,
+                        coWorkers: project.coWorkers || []
+                    };
                     ddlPending.value = !project.ddl || project.ddl === '待定';
                     followUpNote.value = "";
                     showEditModal.value = true;
@@ -1911,6 +1958,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                         banner_count: newProj.bannerCount,
                                         ddl: finalDdl || null,
                                         assignee: newProj.assignee,
+                                        co_workers: (newProj.coWorkers && newProj.coWorkers.length > 0) ? newProj.coWorkers.join(',') : null,
                                         link: newProj.link,
                                         password: newProj.password,
                                         last_updated_by: newProj.lastUpdatedBy,
@@ -2102,6 +2150,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 banner_count: p.bannerCount,
                                 ddl: (p.ddl && p.ddl !== '待定') ? p.ddl : null,
                                 assignee: p.assignee,
+                                co_workers: (p.coWorkers && p.coWorkers.length > 0) ? p.coWorkers.join(',') : null,
                                 link: p.link,
                                 password: p.password,
                                 last_updated_by: p.lastUpdatedBy,
@@ -2269,6 +2318,7 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     copyText,
                     getProgressPercentage,
                     getMemberColorClass,
+                    getMemberAvatar,
                     getMemberBarColorClass,
                     getMemberLoadPercentage,
                     getStatusBadgeClass,

@@ -26,3 +26,45 @@ if (!fs.existsSync(distDir)) {
 // 写入 dist/index.html
 fs.writeFileSync(path.join(distDir, 'index.html'), htmlContent, 'utf8');
 console.log('构建成功: 占位符已替换，已生成 dist/index.html');
+
+// 拷贝 Logo 和头像资源函数
+function copyFileSync(src, dest) {
+    fs.writeFileSync(dest, fs.readFileSync(src));
+}
+
+function copyFolderRecursiveSync(src, dest) {
+    if (!fs.existsSync(src)) return;
+    if (!fs.existsSync(dest)) {
+        fs.mkdirSync(dest, { recursive: true });
+    }
+    const entries = fs.readdirSync(src, { withFileTypes: true });
+    for (let entry of entries) {
+        const srcPath = path.join(src, entry.name);
+        const destPath = path.join(dest, entry.name);
+        if (entry.isDirectory()) {
+            copyFolderRecursiveSync(srcPath, destPath);
+        } else {
+            copyFileSync(srcPath, destPath);
+        }
+    }
+}
+
+// 拷贝 Logo
+const logoName = 'bea37665d260b15a324284add4837a05.png';
+const logoSrc = fs.existsSync(logoName) ? logoName : path.join(__dirname, logoName);
+if (fs.existsSync(logoSrc)) {
+    copyFileSync(logoSrc, path.join(distDir, logoName));
+    console.log('构建成功: Logo 已拷贝到 dist/');
+} else {
+    console.warn('构建警告: 未找到 Logo 文件', logoSrc);
+}
+
+// 拷贝成员头像
+const avatarDirName = '成员头像';
+const avatarSrc = fs.existsSync(avatarDirName) ? avatarDirName : path.join(__dirname, avatarDirName);
+if (fs.existsSync(avatarSrc)) {
+    copyFolderRecursiveSync(avatarSrc, path.join(distDir, avatarDirName));
+    console.log('构建成功: 成员头像已拷贝到 dist/成员头像/');
+} else {
+    console.warn('构建警告: 未找到成员头像文件夹', avatarSrc);
+}
