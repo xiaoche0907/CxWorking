@@ -132,6 +132,13 @@
         .animate-scale-up {
             animation: scaleUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.2s ease-out forwards;
+        }
         .jira-scroll-surface {
             cursor: grab;
             user-select: none;
@@ -461,7 +468,7 @@
                         </div>
 
                         <!-- View Toggle -->
-                        <div class="flex items-center bg-slate-200/60 dark:bg-slate-950/80 border border-slate-250 dark:border-slate-850 p-1 rounded-xl shrink-0 self-start md:self-auto">
+                        <div class="flex items-center bg-slate-200/60 dark:bg-slate-955/80 border border-slate-250 dark:border-slate-850 p-1 rounded-xl shrink-0 self-start md:self-auto">
                             <button @click="viewMode = 'kanban'" :class="['cursor-pointer flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200', viewMode === 'kanban' ? 'bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-250']">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
@@ -473,6 +480,12 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h16M4 18h16" />
                                 </svg>
                                 列表
+                            </button>
+                            <button @click="viewMode = 'completed'" :class="['cursor-pointer flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200', viewMode === 'completed' ? 'bg-emerald-500 dark:bg-emerald-600 text-white shadow-sm font-bold animate-scale-up' : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-250']">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                已完成面板
                             </button>
                         </div>
                     </section>
@@ -544,9 +557,18 @@
 
                                                 <!-- Card Header -->
                                                 <div class="flex justify-between items-start gap-2 mb-2.5 pl-1.5">
-                                                    <span class="text-[10px] font-bold font-outfit text-slate-400 dark:text-slate-500 tracking-wider">#{{ project.id }}</span>
-                                                    <div class="flex items-center gap-1">
-                                                        <button @click="openEditModal(project)" class="cursor-pointer p-1 text-slate-400 hover:text-slate-900 dark:text-slate-500 dark:hover:text-slate-200 transition-colors rounded hover:bg-slate-100 dark:hover:bg-slate-850" title="编辑项目">
+                                                    <span class="text-[10px] font-bold font-outfit text-slate-400 dark:text-slate-505 tracking-wider">#{{ project.id }}</span>
+                                                    <div class="flex items-center gap-1.5">
+                                                        <!-- Glowing Feedback Bubble Icon -->
+                                                        <button v-if="project.feedback" @click.stop="toggleFeedback(project.id)" 
+                                                                class="cursor-pointer p-1 text-rose-500 hover:text-rose-600 dark:text-rose-455 dark:hover:text-rose-350 transition-all rounded hover:bg-rose-50 dark:hover:bg-rose-955/20 relative animate-pulse" 
+                                                                title="点击查看修改意见">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                                            </svg>
+                                                            <span class="absolute top-0 right-0 block h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white dark:ring-slate-900"></span>
+                                                        </button>
+                                                        <button @click="openEditModal(project)" class="cursor-pointer p-1 text-slate-400 hover:text-slate-900 dark:text-slate-505 dark:hover:text-slate-200 transition-colors rounded hover:bg-slate-100 dark:hover:bg-slate-850" title="编辑项目">
                                                             <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                                             </svg>
@@ -614,43 +636,55 @@
                                                 </div>
 
                                                 <!-- Document Link & Password -->
-                                                <div class="flex items-center gap-1.5 mb-3 pt-2.5 border-t border-slate-200 dark:border-slate-850/80 ml-1.5">
-                                                    <button v-if="project.link" @click.stop="copyText(project.link, '链接', project.id, 'link')" 
-                                                            class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm" 
-                                                            :class="copiedStates[project.id + '-link']
-                                                                    ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02] shadow-emerald-100/50 dark:shadow-none'
-                                                                    : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-850'"
-                                                            title="一键复制文档链接">
-                                                        <svg v-if="copiedStates[project.id + '-link']" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                                                        </svg>
-                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                                                        </svg>
-                                                        <span>{{ copiedStates[project.id + '-link'] ? '已复制' : '复制链接' }}</span>
-                                                    </button>
-                                                    <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1">无链接</span>
+                                                <div class="flex flex-col gap-2 mb-3 pt-2.5 border-t border-slate-200 dark:border-slate-850/80 ml-1.5">
+                                                    <div class="flex items-center gap-1.5">
+                                                        <button v-if="project.link" @click.stop="copyText(project.link, '链接', project.id, 'link')" 
+                                                                class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm" 
+                                                                :class="copiedStates[project.id + '-link']
+                                                                        ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02] shadow-emerald-100/50 dark:shadow-none'
+                                                                        : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-850'"
+                                                                title="一键复制文档链接">
+                                                            <svg v-if="copiedStates[project.id + '-link']" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-500 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                                                            </svg>
+                                                            <span>{{ copiedStates[project.id + '-link'] ? '已复制' : '复制链接' }}</span>
+                                                        </button>
+                                                        <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1 border border-dashed border-slate-200 dark:border-slate-800 rounded-lg">无链接</span>
 
-                                                    <button v-if="project.password" @click.stop="copyText(project.password, '密码', project.id, 'password')" 
-                                                            class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm" 
-                                                            :class="copiedStates[project.id + '-password']
-                                                                    ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02] shadow-emerald-100/50 dark:shadow-none'
-                                                                    : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-850'"
-                                                            title="一键复制密码">
-                                                        <svg v-if="copiedStates[project.id + '-password']" xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-emerald-500 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                        <button v-if="project.password" @click.stop="copyText(project.password, '密码', project.id, 'password')" 
+                                                                class="cursor-pointer flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm" 
+                                                                :class="copiedStates[project.id + '-password']
+                                                                        ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02] shadow-emerald-100/50 dark:shadow-none'
+                                                                        : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 border border-slate-200 dark:border-slate-850'"
+                                                                title="一键复制密码">
+                                                            <svg v-if="copiedStates[project.id + '-password']" xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-emerald-500 animate-scale-up" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m9-3h-3m3 3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                            </svg>
+                                                            <span>{{ copiedStates[project.id + '-password'] ? '已复制' : '密码: ' + project.password }}</span>
+                                                        </button>
+                                                        <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1 border border-dashed border-slate-200 dark:border-slate-800 rounded-lg">无密码</span>
+                                                    </div>
+
+                                                    <!-- Clickable Shein Brand Link Button -->
+                                                    <a v-if="project.brandLink" :href="project.brandLink" target="_blank"
+                                                       class="cursor-pointer w-full flex items-center justify-center gap-1.5 py-1.5 px-2 text-[10px] font-bold rounded-lg border border-cyan-200 dark:border-cyan-800/80 text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/20 hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-all duration-300 shadow-sm"
+                                                       title="点击打开品牌的 Shein 链接">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                                                         </svg>
-                                                        <svg v-else xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 7a2 2 0 012 2m9-3h-3m3 3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                        </svg>
-                                                        <span>{{ copiedStates[project.id + '-password'] ? '已复制' : '密码: ' + project.password }}</span>
-                                                    </button>
-                                                    <span v-else class="flex-1 text-[10px] text-slate-400 dark:text-slate-650 text-center py-1">无密码</span>
+                                                        <span>品牌 Shein 链接 ↗</span>
+                                                    </a>
                                                 </div>
 
                                                 <!-- Attachments List (Kanban Card) -->
                                                 <div v-if="project.attachments && project.attachments.length > 0" class="flex flex-wrap gap-1 mb-3 ml-1.5 pt-2.5 border-t border-slate-200 dark:border-slate-850/80">
-                                                    <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" download class="inline-flex items-center gap-1 py-1 px-2 bg-violet-50/50 dark:bg-violet-955/40 hover:bg-violet-100 dark:hover:bg-violet-900/50 border border-violet-200/50 dark:border-violet-800/30 text-[10px] text-violet-650 dark:text-violet-400 font-semibold rounded-lg transition-colors max-w-full" :title="file.name">
+                                                    <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" @click="handleAttachmentClick(file, $event)" class="inline-flex items-center gap-1 py-1 px-2 bg-violet-50/50 dark:bg-violet-955/40 hover:bg-violet-100 dark:hover:bg-violet-900/50 border border-violet-200/50 dark:border-violet-800/30 text-[10px] text-violet-650 dark:text-violet-400 font-semibold rounded-lg transition-colors max-w-full" :title="file.name">
                                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                         </svg>
@@ -712,9 +746,29 @@
                                             <tr v-for="project in filteredProjects" :key="project.id" class="hover:bg-slate-50 dark:hover:bg-slate-850/20 transition-all duration-150">
                                                 <td class="py-4 px-6 font-bold font-outfit text-violet-650 dark:text-violet-400 text-xs whitespace-nowrap">#{{ project.id }}</td>
                                                 <td class="py-4 px-6">
-                                                    <span class="font-bold text-slate-800 dark:text-slate-200 hover:text-violet-650 dark:hover:text-white transition-colors cursor-pointer" @click="openEditModal(project)">
-                                                        {{ project.name }}
-                                                    </span>
+                                                    <div class="flex items-center gap-2">
+                                                        <span class="font-bold text-slate-800 dark:text-slate-200 hover:text-violet-650 dark:hover:text-white transition-colors cursor-pointer" @click="openEditModal(project)">
+                                                            {{ project.name }}
+                                                        </span>
+                                                        <!-- Glowing Feedback Bubble Icon in List View -->
+                                                        <button v-if="project.feedback" @click.stop="toggleFeedback(project.id)" 
+                                                                class="cursor-pointer p-1 text-rose-500 hover:text-rose-600 dark:text-rose-455 dark:hover:text-rose-350 transition-all rounded hover:bg-rose-50 dark:hover:bg-rose-955/20 relative" 
+                                                                title="查看修改意见">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                                            </svg>
+                                                        </button>
+                                                        <a v-if="project.brandLink" :href="project.brandLink" target="_blank" 
+                                                           class="inline-flex items-center gap-1 px-1.5 py-0.5 text-[9px] font-bold bg-cyan-50 dark:bg-cyan-950/40 border border-cyan-200 dark:border-cyan-800/60 text-cyan-600 dark:text-cyan-400 rounded hover:bg-cyan-100 dark:hover:bg-cyan-900/50 transition-all duration-300"
+                                                           title="点击打开品牌的 Shein 链接">
+                                                            <span>Shein ↗</span>
+                                                        </a>
+                                                    </div>
+                                                    <!-- Expandable feedback in List View -->
+                                                    <div v-if="showProjectFeedback[project.id]" class="mt-2 p-2.5 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 rounded-lg text-xs text-rose-700 dark:text-rose-350 max-w-xl animate-scale-up">
+                                                        <span class="font-bold block mb-1">📢 修改意见:</span>
+                                                        <div class="whitespace-pre-wrap break-words leading-relaxed font-medium">{{ project.feedback }}</div>
+                                                    </div>
                                                 </td>
                                                 <td class="py-4 px-6">
                                                     <span class="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800" :class="getStatusBadgeClass(project.status)">
@@ -787,7 +841,7 @@
 
                                                          <!-- Attachments in List View -->
                                                          <div v-if="project.attachments && project.attachments.length > 0" class="flex flex-wrap gap-1 items-center">
-                                                             <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" download class="inline-flex items-center gap-1 py-1.5 px-2.5 bg-violet-50/50 dark:bg-violet-955/20 hover:bg-violet-100 dark:hover:bg-violet-900/40 border border-violet-200/40 dark:border-violet-800/20 text-[10px] text-violet-600 dark:text-violet-400 font-semibold rounded-xl transition-colors max-w-full" :title="file.name">
+                                                             <a v-for="file in project.attachments" :key="file.url" :href="file.url" target="_blank" @click="handleAttachmentClick(file, $event)" class="inline-flex items-center gap-1 py-1.5 px-2.5 bg-violet-50/50 dark:bg-violet-955/20 hover:bg-violet-100 dark:hover:bg-violet-900/40 border border-violet-200/40 dark:border-violet-800/20 text-[10px] text-violet-650 dark:text-violet-400 font-semibold rounded-xl transition-colors max-w-full" :title="file.name">
                                                                  <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 text-violet-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                                                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
                                                                  </svg>
@@ -829,6 +883,134 @@
                                             </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+
+                            <!-- Completed Projects View -->
+                            <div v-if="viewMode === 'completed'" class="glass-panel rounded-2xl p-6 shadow-sm animate-scale-up">
+                                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-200 dark:border-slate-800/80">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-500/20 dark:border-emerald-800/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 shadow-sm">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <h2 class="text-base font-extrabold text-slate-900 dark:text-white">已完成项目面板</h2>
+                                            <p class="text-[11px] text-slate-550 dark:text-slate-400 mt-0.5">在此查看和管理所有已完成的归档项目。共收录 <span class="font-extrabold text-emerald-600 dark:text-emerald-400">{{ completedProjects.length }}</span> 个项目。</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs font-semibold text-slate-400 dark:text-slate-555">
+                                        项目历史归档
+                                    </div>
+                                </div>
+
+                                <!-- Grid of completed project cards -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    <div v-for="project in completedProjects" :key="project.id" 
+                                         class="glass-card rounded-2xl p-5 border border-slate-200 dark:border-slate-800/80 relative overflow-hidden flex flex-col justify-between min-h-[220px]">
+                                        
+                                        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
+
+                                        <div>
+                                            <!-- Card Header -->
+                                            <div class="flex justify-between items-start gap-2 mb-3 pl-1.5">
+                                                <span class="text-[10px] font-bold font-outfit text-slate-455 dark:text-slate-555 tracking-wider">#{{ project.id }}</span>
+                                                <div class="flex items-center gap-1">
+                                                    <!-- Glowing Feedback Bubble Icon in Completed Card -->
+                                                    <button v-if="project.feedback" @click.stop="toggleFeedback(project.id)" 
+                                                            class="cursor-pointer p-1 text-rose-500 hover:text-rose-600 dark:text-rose-455 dark:hover:text-rose-350 transition-all rounded hover:bg-rose-50 dark:hover:bg-rose-955/20 relative" 
+                                                            title="点击查看修改意见">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
+                                                        </svg>
+                                                    </button>
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-450 border border-emerald-500/20">
+                                                        已完成 ✓
+                                                    </span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Card Title -->
+                                            <h4 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-4 leading-snug line-clamp-2 pl-1.5 cursor-pointer hover:text-emerald-600 transition-colors" :title="project.name" @click="openEditModal(project)">
+                                                {{ project.name }}
+                                            </h4>
+
+                                            <!-- Expanded Feedback Speech Bubble in Completed Card -->
+                                            <div v-if="showProjectFeedback[project.id]" 
+                                                 class="mb-3.5 mx-1.5 p-3 bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/40 rounded-xl relative text-xs text-rose-700 dark:text-rose-350 shadow-inner shadow-rose-100/50 dark:shadow-none animate-scale-up">
+                                                <div class="absolute -top-1.5 right-6 w-3 h-3 bg-rose-50 dark:bg-[#101931] border-l border-t border-rose-200 dark:border-rose-900/40 transform rotate-45"></div>
+                                                <div class="font-extrabold flex items-center gap-1 mb-1 text-[10px] uppercase tracking-wider text-rose-800 dark:text-rose-455">
+                                                    <span>📢 客户修改意见/反馈:</span>
+                                                </div>
+                                                <div class="whitespace-pre-wrap break-words leading-relaxed font-medium">{{ project.feedback }}</div>
+                                            </div>
+
+                                            <!-- Parameters -->
+                                            <div class="space-y-2 mb-4 pl-1.5 text-xs text-slate-500 dark:text-slate-400">
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <span>完成进度:</span>
+                                                    <span class="font-bold text-slate-800 dark:text-slate-200 font-outfit">{{ project.completedCount }} / {{ project.totalCount }} 套 ({{ project.bannerCount }} Banners)</span>
+                                                </div>
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <span>负责人:</span>
+                                                    <div class="flex items-center gap-1.5">
+                                                        <img :src="getMemberAvatar(project.assignee)" class="w-4 h-4 rounded-full object-cover border border-slate-200 dark:border-slate-800" :alt="project.assignee">
+                                                        <span class="text-slate-800 dark:text-slate-200 font-semibold">{{ project.assignee }}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center justify-between gap-2">
+                                                    <span>最后更新:</span>
+                                                    <span class="font-semibold font-outfit text-slate-700 dark:text-slate-350">
+                                                        {{ formatLogTime(project.lastUpdatedAt) }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Footer Action Row -->
+                                        <div class="pt-3 border-t border-slate-150 dark:border-slate-850/80 ml-1.5 space-y-2">
+                                            <!-- Shein & Document links -->
+                                            <div class="flex gap-2">
+                                                <!-- Shein Link if exists -->
+                                                <a v-if="project.brandLink" :href="project.brandLink" target="_blank"
+                                                   class="flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 text-[10px] font-bold rounded-lg border border-cyan-200 dark:border-cyan-805 text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/20 hover:bg-cyan-105 dark:hover:bg-cyan-900/50 transition-all duration-300 shadow-sm"
+                                                   title="点击打开品牌的 Shein 链接">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                                    </svg>
+                                                    <span>品牌Shein ↗</span>
+                                                </a>
+                                                <!-- Document Link if exists -->
+                                                <button v-if="project.link" @click.stop="copyText(project.link, '链接', project.id, 'link')"
+                                                        class="flex-1 flex items-center justify-center gap-1 py-1.5 px-2 text-[10px] font-semibold rounded-lg border transition-all duration-300 shadow-sm"
+                                                        :class="copiedStates[project.id + '-link']
+                                                                ? 'bg-emerald-50 border-emerald-300 text-emerald-600 dark:bg-emerald-955/40 dark:border-emerald-800 dark:text-emerald-400 scale-[1.02]'
+                                                                : 'bg-slate-50 dark:bg-slate-900/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-450 hover:text-blue-600 dark:hover:text-blue-400 border border-slate-200 dark:border-slate-850'">
+                                                    <span>{{ copiedStates[project.id + '-link'] ? '已复制' : '复制素材' }}</span>
+                                                </button>
+                                            </div>
+
+                                            <!-- Admin / Restore action -->
+                                            <div class="flex items-center justify-between gap-2 pt-1">
+                                                <button @click="openEditModal(project)" class="cursor-pointer text-[10px] font-bold text-slate-450 hover:text-slate-800 dark:hover:text-white transition-colors">
+                                                    编辑详情
+                                                </button>
+                                                <button @click="updateProjectStatus(project, 'client_review')" class="cursor-pointer text-[10px] font-bold text-violet-600 hover:text-violet-800 dark:text-violet-450 dark:hover:text-violet-300 transition-colors flex items-center gap-0.5">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 6H16" />
+                                                    </svg>
+                                                    恢复至进行中
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div v-if="completedProjects.length === 0" class="col-span-full py-16 text-center text-slate-400 dark:text-slate-600 flex flex-col items-center justify-center gap-2.5">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-slate-350 dark:text-slate-800" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                        </svg>
+                                        <span class="text-sm font-semibold">暂无已完成归档的项目</span>
+                                    </div>
                                 </div>
                             </div>
                             </div>
@@ -960,12 +1142,20 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">文档/素材链接 (可选)</label>
-                                        <input type="url" v-model="formProject.link" placeholder="如百度网盘链接" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                        <input type="url" v-model="formProject.link" placeholder="如百度网盘链接" class="w-full px-3 py-2 bg-white dark:bg-slate-905 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                     </div>
                                     <div>
                                         <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">提取密码 (可选)</label>
-                                        <input type="text" v-model="formProject.password" placeholder="如 4位提取码" class="w-full px-3 py-2 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                        <input type="text" v-model="formProject.password" placeholder="如 4位提取码" class="w-full px-3 py-2 bg-white dark:bg-slate-905 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                     </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">品牌Shein链接 (可选)</label>
+                                    <input type="url" v-model="formProject.brandLink" placeholder="如 https://www.shein.com/..." class="w-full px-3 py-2 bg-white dark:bg-slate-905 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">修改意见 / 客户反馈 (可选)</label>
+                                    <textarea v-model="formProject.feedback" placeholder="在此记录该项目的修改意见（若有），将以气泡形式显示在卡片上..." rows="2" class="w-full px-3 py-2 bg-white dark:bg-slate-905 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"></textarea>
                                 </div>
                                 <!-- Attachments Upload Section -->
                                 <div class="p-4 bg-slate-50 dark:bg-slate-955/65 border border-slate-150 dark:border-slate-850 rounded-2xl">
@@ -996,7 +1186,7 @@
                                                 <span class="text-[10px] text-slate-455 dark:text-slate-500 shrink-0">({{ file.size || '未知' }})</span>
                                             </div>
                                             <div class="flex items-center gap-1.5 shrink-0">
-                                                <a :href="file.url" target="_blank" download class="text-violet-650 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">查看</a>
+                                                <a :href="file.url" target="_blank" @click="handleAttachmentClick(file, $event)" class="text-violet-650 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">查看</a>
                                                 <button type="button" @click="removeAttachment(idx)" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">删除</button>
                                             </div>
                                         </div>
@@ -1104,6 +1294,14 @@
                                         <input type="text" v-model="formProject.password" placeholder="如 4位密码" class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
                                     </div>
                                 </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">品牌Shein链接 (可选)</label>
+                                    <input type="url" v-model="formProject.brandLink" placeholder="如 https://www.shein.com/..." class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-855 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 uppercase">修改意见 / 客户反馈 (可选)</label>
+                                    <textarea v-model="formProject.feedback" placeholder="在此记录该项目的修改意见（若有），将以气泡形式显示在卡片上..." rows="2" class="w-full px-3 py-2 bg-white dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-slate-850 dark:text-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 transition-all"></textarea>
+                                </div>
                                 <!-- Attachments Upload Section -->
                                 <div class="p-4 bg-slate-50 dark:bg-slate-955/65 border border-slate-150 dark:border-slate-850 rounded-2xl">
                                     <div class="flex items-center justify-between mb-2">
@@ -1133,7 +1331,7 @@
                                                 <span class="text-[10px] text-slate-455 dark:text-slate-500 shrink-0">({{ file.size || '未知' }})</span>
                                             </div>
                                             <div class="flex items-center gap-1.5 shrink-0">
-                                                <a :href="file.url" target="_blank" download class="text-violet-650 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">查看</a>
+                                                <a :href="file.url" target="_blank" @click="handleAttachmentClick(file, $event)" class="text-violet-650 dark:text-violet-400 hover:text-violet-800 dark:hover:text-violet-300 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">查看</a>
                                                 <button type="button" @click="removeAttachment(idx)" class="text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 font-bold transition-all px-1.5 py-0.5 rounded hover:bg-slate-100 dark:hover:bg-slate-800">删除</button>
                                             </div>
                                         </div>
@@ -1278,6 +1476,33 @@
                     </div>
                 </div>
             </transition-group>
+        </div>
+
+        <!-- Immersive Image Preview Lightbox -->
+        <div v-if="showLightbox" class="fixed inset-0 z-[1000] flex flex-col items-center justify-center bg-slate-950/85 backdrop-blur-md transition-all duration-300 animate-fade-in" @click.self="closeLightbox">
+            <!-- Close Button -->
+            <button @click="closeLightbox" class="absolute top-4 right-4 cursor-pointer p-2.5 rounded-full bg-slate-900/60 hover:bg-slate-800 text-white hover:scale-105 transition-all shadow-md z-[1010]" title="关闭">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <!-- Toolbar -->
+            <div class="absolute top-4 left-4 flex items-center gap-3 z-[1010] bg-slate-900/60 backdrop-blur-sm px-4 py-2 rounded-xl text-white text-xs font-semibold shadow-md">
+                <span class="max-w-[200px] truncate" :title="lightboxImgName">{{ lightboxImgName }}</span>
+                <span class="text-slate-450">|</span>
+                <a :href="lightboxImgUrl" target="_blank" download class="hover:text-violet-400 font-bold transition-colors flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    下载原图
+                </a>
+            </div>
+
+            <!-- Immersive Image Area -->
+            <div class="relative max-w-[90%] max-h-[80%] flex items-center justify-center select-none" @click.self="closeLightbox">
+                <img :src="lightboxImgUrl" class="max-w-full max-h-full rounded-lg object-contain shadow-2xl animate-scale-up border border-slate-800/40 select-text" :alt="lightboxImgName">
+            </div>
         </div>
     </div>
 
@@ -1451,6 +1676,8 @@ CREATE TABLE cx_projects (
     attachments TEXT, -- 项目附件 (JSON 字符串)
     link TEXT,
     password TEXT,
+    brand_link TEXT, -- 品牌Shein链接
+    feedback TEXT, -- 修改意见
     last_updated_by TEXT,
     last_updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc'::text, NOW())
 );
@@ -1458,6 +1685,8 @@ CREATE TABLE cx_projects (
 -- 如果表已存在，执行以下语句以升级表：
 -- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS co_workers TEXT;
 -- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS attachments TEXT;
+-- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS brand_link TEXT;
+-- ALTER TABLE cx_projects ADD COLUMN IF NOT EXISTS feedback TEXT;
 
 CREATE TABLE cx_logs (
     id BIGINT PRIMARY KEY,
@@ -1518,6 +1747,34 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 const showEditModal = ref(false);
                 const toasts = ref([]);
                 const copiedStates = ref({});
+                const showProjectFeedback = ref({});
+                const toggleFeedback = (id) => {
+                    showProjectFeedback.value[id] = !showProjectFeedback.value[id];
+                };
+
+                // Lightbox Preview
+                const showLightbox = ref(false);
+                const lightboxImgUrl = ref("");
+                const lightboxImgName = ref("");
+                const openLightbox = (url, name) => {
+                    lightboxImgUrl.value = url;
+                    lightboxImgName.value = name;
+                    showLightbox.value = true;
+                };
+                const closeLightbox = () => {
+                    showLightbox.value = false;
+                };
+                const isImageFile = (filename) => {
+                    if (!filename) return false;
+                    const ext = filename.split('.').pop().toLowerCase();
+                    return ['png', 'jpg', 'jpeg', 'webp', 'gif', 'svg'].includes(ext);
+                };
+                const handleAttachmentClick = (file, event) => {
+                    if (isImageFile(file.name)) {
+                        event.preventDefault();
+                        openLightbox(file.url, file.name);
+                    }
+                };
                 
                 // Drag & Drop
                 const draggingProject = ref(null);
@@ -1539,7 +1796,9 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     ddl: "",
                     assignee: "",
                     link: "",
-                    password: ""
+                    password: "",
+                    brandLink: "",
+                    feedback: ""
                 });
                 const followUpNote = ref("");
 
@@ -1645,6 +1904,8 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 attachments: p.attachments ? JSON.parse(p.attachments) : [],
                                 link: p.link,
                                 password: p.password,
+                                brandLink: p.brand_link || "",
+                                feedback: p.feedback || "",
                                 lastUpdatedBy: p.last_updated_by,
                                 lastUpdatedAt: p.last_updated_at
                             }));
@@ -2039,6 +2300,17 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     });
                 });
 
+                const completedProjects = computed(() => {
+                    return projects.value.filter(p => {
+                        if (p.status !== 'completed') return false;
+                        const matchSearch = searchQuery.value === "" || 
+                            p.name.toLowerCase().includes(searchQuery.value.toLowerCase()) || 
+                            p.id.toLowerCase().includes(searchQuery.value.toLowerCase());
+                        const matchAssignee = filterAssignee.value === "" || p.assignee === filterAssignee.value;
+                        return matchSearch && matchAssignee;
+                    }).sort((a, b) => new Date(b.lastUpdatedAt) - new Date(a.lastUpdatedAt));
+                });
+
                 const kanbanColumns = computed(() => {
                     const columns = [
                         { status: "waiting_materials", title: "等待素材" },
@@ -2184,9 +2456,46 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                 };
 
                  // Add/Edit Modals Setup
+                const generateNextProjectId = () => {
+                    if (projects.value.length === 0) {
+                        return "E101";
+                    }
+                    let maxNum = 0;
+                    let prefix = "E";
+                    projects.value.forEach(p => {
+                        const match = p.id.match(/^([a-zA-Z]*)(\d+)$/);
+                        if (match) {
+                            const pfx = match[1] || "E";
+                            const num = parseInt(match[2], 10);
+                            if (num > maxNum) {
+                                maxNum = num;
+                                prefix = pfx;
+                            }
+                        } else {
+                            const numOnly = p.id.replace(/\D/g, "");
+                            if (numOnly) {
+                                const num = parseInt(numOnly, 10);
+                                if (num > maxNum) {
+                                    maxNum = num;
+                                }
+                            }
+                        }
+                    });
+                    if (maxNum === 0) {
+                        return "E101";
+                    }
+                    let nextNum = maxNum + 1;
+                    let nextId = `${prefix}${nextNum}`;
+                    while (projects.value.some(p => p.id === nextId)) {
+                        nextNum++;
+                        nextId = `${prefix}${nextNum}`;
+                    }
+                    return nextId;
+                };
+
                 const openAddModal = () => {
                     formProject.value = {
-                        id: `E${(projects.value.length + 101).toString()}`,
+                        id: generateNextProjectId(),
                         name: "",
                         status: "waiting_materials",
                         totalCount: 100,
@@ -2197,7 +2506,9 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                         coWorkers: [],
                         attachments: [],
                         link: "",
-                        password: ""
+                        password: "",
+                        brandLink: "",
+                        feedback: ""
                     };
                     ddlPending.value = false;
                     showAddModal.value = true;
@@ -2240,8 +2551,9 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                     assignee: newProj.assignee,
                                     co_workers: (newProj.coWorkers && newProj.coWorkers.length > 0) ? newProj.coWorkers.join(',') : null,
                                     attachments: (newProj.attachments && newProj.attachments.length > 0) ? JSON.stringify(newProj.attachments) : null,
-                                    link: newProj.link,
                                     password: newProj.password,
+                                    brand_link: newProj.brandLink || null,
+                                    feedback: newProj.feedback || null,
                                     last_updated_by: newProj.lastUpdatedBy,
                                     last_updated_at: newProj.lastUpdatedAt
                                 });
@@ -2301,8 +2613,9 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                         assignee: newProj.assignee,
                                         co_workers: (newProj.coWorkers && newProj.coWorkers.length > 0) ? newProj.coWorkers.join(',') : null,
                                         attachments: (newProj.attachments && newProj.attachments.length > 0) ? JSON.stringify(newProj.attachments) : null,
-                                        link: newProj.link,
                                         password: newProj.password,
+                                        brand_link: newProj.brandLink || null,
+                                        feedback: newProj.feedback || null,
                                         last_updated_by: newProj.lastUpdatedBy,
                                         last_updated_at: newProj.lastUpdatedAt
                                     })
@@ -2606,6 +2919,8 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                                 attachments: (p.attachments && p.attachments.length > 0) ? JSON.stringify(p.attachments) : null,
                                 link: p.link,
                                 password: p.password,
+                                brand_link: p.brandLink || null,
+                                feedback: p.feedback || null,
                                 last_updated_by: p.lastUpdatedBy,
                                 last_updated_at: p.lastUpdatedAt
                             }));
@@ -2752,6 +3067,16 @@ ALTER TABLE cx_logs DISABLE ROW LEVEL SECURITY;`;
                     statusMap,
                     kanbanColumns,
                     filteredProjects,
+                    completedProjects,
+                    showProjectFeedback,
+                    toggleFeedback,
+                    showLightbox,
+                    lightboxImgUrl,
+                    lightboxImgName,
+                    openLightbox,
+                    closeLightbox,
+                    isImageFile,
+                    handleAttachmentClick,
                     draggingProject,
                     dragOverColumn,
                     urgentProjects,
